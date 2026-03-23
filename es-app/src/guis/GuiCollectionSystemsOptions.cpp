@@ -23,6 +23,20 @@ GuiCollectionSystemsOptions::GuiCollectionSystemsOptions(Window* window)
 
 void GuiCollectionSystemsOptions::initializeMenu()
 {
+	// System configuration mode (lite/full) - at the top
+	auto systemConfigMode = std::make_shared<OptionListComponent<std::string>>(mWindow, _("SYSTEMS CONFIGURATION MODE"), false);
+	systemConfigMode->add(_("FULL"), "full", Settings::getInstance()->getString("SystemConfigMode") == "full");
+	systemConfigMode->add(_("LITE"), "lite", Settings::getInstance()->getString("SystemConfigMode") == "lite");
+	addWithDescription(_("SYSTEMS CONFIGURATION MODE"), _("Lite mode uses a simplified system list for faster boot. Requires restart to take effect."), systemConfigMode);
+	addSaveFunc([this, systemConfigMode]
+	{
+		if (Settings::getInstance()->setString("SystemConfigMode", systemConfigMode->getSelected()))
+		{
+			Settings::getInstance()->saveFile();
+			setVariable("restartRequired", true);
+		}
+	});
+
 	addGroup(_("COLLECTIONS TO DISPLAY"));
 
 	// SYSTEMS DISPLAYED
@@ -407,7 +421,7 @@ void GuiCollectionSystemsOptions::initializeMenu()
 			window->pushGui(ViewController::get());
 		}
 		else if (getVariable("reloadAll"))
-		{			
+		{
 			Settings::getInstance()->saveFile();
 
 			CollectionSystemManager::get()->loadEnabledListFromSettings();
@@ -416,6 +430,9 @@ void GuiCollectionSystemsOptions::initializeMenu()
 			ViewController::get()->reloadAll(mWindow);
 			mWindow->closeSplashScreen();
 		}
+
+		if (getVariable("restartRequired"))
+			mWindow->displayNotificationMessage(_U("\uF021  ") + _("RESTART EMULATIONSTATION TO APPLY THE NEW SYSTEMS CONFIGURATION"));
 	});
 }
 

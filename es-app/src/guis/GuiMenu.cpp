@@ -1255,17 +1255,16 @@ void GuiMenu::openDeveloperSettings()
 	s->addWithLabel(_("OPTIMIZE VIDEO VRAM USAGE"), optimizeVideo);
 	s->addSaveFunc([optimizeVideo] { Settings::getInstance()->setBool("OptimizeVideo", optimizeVideo->getState()); });
 	
-	s->onFinalize([s, window]
-	{					
-		if (s->getVariable("reboot"))
-			window->displayNotificationMessage(_U("\uF011  ") + _("REBOOT REQUIRED TO APPLY THE NEW CONFIGURATION"));
-
-		if (s->getVariable("reloadAll"))
-		{
-			ViewController::get()->reloadAll(window);
-			window->closeSplashScreen();
-		}
-	});
+		s->onFinalize([s, window]
+		{						
+			if (s->getVariable("reboot"))
+				window->displayNotificationMessage(_U("\uF011  ") + _("REBOOT REQUIRED TO APPLY THE NEW CONFIGURATION"));
+	
+			if (s->getVariable("reloadAll"))
+			{
+				ViewController::get()->reloadAll(window);
+				window->closeSplashScreen();
+			}	});
 
 	mWindow->pushGui(s);
 }

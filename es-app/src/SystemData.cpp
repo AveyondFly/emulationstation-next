@@ -1270,17 +1270,33 @@ void SystemData::deleteSystems()
 
 std::string SystemData::getConfigPath()
 {
+	// Check for lite mode configuration
+	bool liteMode = (Settings::getInstance()->getString("SystemConfigMode") == "lite");
+	std::string cfgSuffix = liteMode ? "_lite" : "";
+
 	std::string customPath = Paths::getUserEmulationStationPath() + "/es_systems_custom.cfg";
 	if (Utils::FileSystem::exists(customPath))
 		return customPath;
 
-	std::string userdataPath = Paths::getUserEmulationStationPath() + "/es_systems.cfg";
+	std::string userdataPath = Paths::getUserEmulationStationPath() + "/es_systems" + cfgSuffix + ".cfg";
 	if(Utils::FileSystem::exists(userdataPath))
 		return userdataPath;
 
-	userdataPath = Paths::getEmulationStationPath() + "/es_systems.cfg";
+	userdataPath = Paths::getEmulationStationPath() + "/es_systems" + cfgSuffix + ".cfg";
 	if (Utils::FileSystem::exists(userdataPath))
 		return userdataPath;
+
+	// Fallback to default config if lite config not found
+	if (liteMode)
+	{
+		userdataPath = Paths::getUserEmulationStationPath() + "/es_systems.cfg";
+		if(Utils::FileSystem::exists(userdataPath))
+			return userdataPath;
+
+		userdataPath = Paths::getEmulationStationPath() + "/es_systems.cfg";
+		if (Utils::FileSystem::exists(userdataPath))
+			return userdataPath;
+	}
 
 	return "/etc/emulationstation/es_systems.cfg"; // Backward compatibility with Retropie
 }

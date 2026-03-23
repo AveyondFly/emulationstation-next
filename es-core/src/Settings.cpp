@@ -173,6 +173,7 @@ void Settings::setDefaults()
 	mBoolMap["VSync"] = Settings::_VSync;
 	mStringMap["FolderViewMode"] = "always";
 	mStringMap["HiddenSystems"] = "";
+	mStringMap["SystemConfigMode"] = "full";
 
 	mBoolMap["PublicWebAccess"] = false;	
 	mBoolMap["FirstJoystickOnly"] = false;
