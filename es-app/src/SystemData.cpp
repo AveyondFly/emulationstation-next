@@ -331,12 +331,20 @@ void SystemData::populateFolder(FolderData* folder, std::unordered_map<std::stri
 			if (mMetadata.name == "vpinball" && fn == "roms")
 				continue;			
 
-			// Skip ports folders, as many folders in ports causes slow down at startup
-			if (fileInfo.path.rfind("ports") != std::string::npos)
+			// Hardcoded optimisation : ports only scans root directory, skip all subfolders
+			if (mMetadata.name == "ports")
 				continue;
 
-			// Skip windows folder for the same reason as ports folder
-			if (fileInfo.path.rfind("windows") != std::string::npos)
+			// Hardcoded optimisation : windows only scans root directory, skip all subfolders
+			if (mMetadata.name == "windows")
+				continue;
+
+			// Hardcoded optimisation : pymo only scans root directory for .pymo files
+			if (mMetadata.name == "pymo")
+				continue;
+
+			// Hardcoded optimisation : onscripter only scans root directory for .ons files
+			if (mMetadata.name == "onscripter")
 				continue;
 
 			FolderData* newFolder = new FolderData(filePath, this);
