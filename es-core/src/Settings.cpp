@@ -175,6 +175,8 @@ void Settings::setDefaults()
 	mStringMap["HiddenSystems"] = "";
 	mStringMap["SystemConfigMode"] = "full";
 
+	mBoolMap["ZaparooEnabled"] = false;
+
 	mBoolMap["PublicWebAccess"] = false;	
 	mBoolMap["FirstJoystickOnly"] = false;
     mBoolMap["EnableSounds"] = false;

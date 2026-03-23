@@ -21,7 +21,7 @@ void Zaparoo::checkZaparooEnabledAsync(const std::function<void(bool enabled)>& 
 {
 	std::thread([func]()
 	{
-		bool enabled = isZaparooEnabled(3000);
+		bool enabled = isZaparooEnabled(500);
 		if (func)
 			func(enabled);
 	}).detach();

@@ -532,7 +532,10 @@ int main(int argc, char* argv[])
 	HttpReq::resetCookies();
 	Genres::init();
 	MetaDataList::initMetadata();
-	Zaparoo::checkZaparooEnabledAsync();
+
+	// Check Zaparoo service only if enabled in settings
+	if (Settings::getInstance()->getBool("ZaparooEnabled"))
+		Zaparoo::checkZaparooEnabledAsync();
 
 	Window window;
 	SystemScreenSaver screensaver(&window);
