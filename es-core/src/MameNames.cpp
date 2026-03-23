@@ -3,6 +3,7 @@
 #include "resources/ResourceManager.h"
 #include "utils/FileSystemUtil.h"
 #include "Log.h"
+#include "Settings.h"
 #include <pugixml/src/pugixml.hpp>
 #include "utils/StringUtil.h"
 #include <string.h>
@@ -123,17 +124,19 @@ MameNames::MameNames()
 			LOG(LogError) << "Error parsing XML file \"" << xmlpath << "\"!\n	" << result.description();
 	}
 	
-	// Read gun games for non arcade systems
-	xmlpath = ResourceManager::getInstance()->getResourcePath(":/gamesdb.xml");
-	if (Utils::FileSystem::exists(xmlpath))
+	// Read gun games for non arcade systems (skip if ControllerTypeDetection is disabled)
+	if (Settings::getInstance()->getBool("ControllerTypeDetection"))
 	{
-		result = doc.load_file(WINSTRINGW(xmlpath).c_str());
-		if (result)
+		xmlpath = ResourceManager::getInstance()->getResourcePath(":/gamesdb.xml");
+		if (Utils::FileSystem::exists(xmlpath))
 		{
-			pugi::xml_node systems = doc.child("systems");
-			if (systems)
+			result = doc.load_file(WINSTRINGW(xmlpath).c_str());
+			if (result)
 			{
-				LOG(LogInfo) << "Parsing XML file \"" << xmlpath;
+				pugi::xml_node systems = doc.child("systems");
+				if (systems)
+				{
+					LOG(LogInfo) << "Parsing XML file \"" << xmlpath;
 
 				for (pugi::xml_node systemNode = systems.child("system"); systemNode; systemNode = systemNode.next_sibling("system"))
 				{
@@ -280,6 +283,7 @@ MameNames::MameNames()
 						    }
 						}
 					}	
+				}
 				}
 			}
 			else 
