@@ -939,32 +939,33 @@ void DetailedContainer::updateControls(FileData* file, bool isClearing, int move
 			mNotKidGame->setVisible(!file->getKidGame());
 
 		// Gun game
+		bool controllerDetectionEnabled = Settings::getInstance()->getBool("ControllerTypeDetection");
 		if (mGunGame != nullptr)
-			mGunGame->setVisible(file->isLightGunGame());
+			mGunGame->setVisible(controllerDetectionEnabled && file->isLightGunGame());
 
 		if (mNotGunGame != nullptr)
-			mNotGunGame->setVisible(!file->isLightGunGame());
+			mNotGunGame->setVisible(controllerDetectionEnabled && !file->isLightGunGame());
 
 		// Wheel game
 		if (mWheelGame != nullptr)
-			mWheelGame->setVisible(file->isWheelGame());
+			mWheelGame->setVisible(controllerDetectionEnabled && file->isWheelGame());
 
 		if (mNotWheelGame != nullptr)
-			mNotWheelGame->setVisible(!file->isWheelGame());
+			mNotWheelGame->setVisible(controllerDetectionEnabled && !file->isWheelGame());
 
 		// Trackball game
 		if (mTrackballGame != nullptr)
-			mTrackballGame->setVisible(file->isTrackballGame());
+			mTrackballGame->setVisible(controllerDetectionEnabled && file->isTrackballGame());
 
 		if (mNotTrackballGame != nullptr)
-			mNotTrackballGame->setVisible(!file->isTrackballGame());
+			mNotTrackballGame->setVisible(controllerDetectionEnabled && !file->isTrackballGame());
 
 		// Spinner game
 		if (mSpinnerGame != nullptr)
-			mSpinnerGame->setVisible(file->isSpinnerGame());
+			mSpinnerGame->setVisible(controllerDetectionEnabled && file->isSpinnerGame());
 
 		if (mNotSpinnerGame != nullptr)
-			mNotSpinnerGame->setVisible(!file->isSpinnerGame());
+			mNotSpinnerGame->setVisible(controllerDetectionEnabled && !file->isSpinnerGame());
 
 		bool systemHasCheevos = 
 			SystemConf::getInstance()->getBool("global.retroachievements") && (

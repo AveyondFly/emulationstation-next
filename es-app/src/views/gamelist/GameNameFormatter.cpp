@@ -72,10 +72,13 @@ GameNameFormatter::GameNameFormatter(SystemData* system)
 	mShowManualIcon = system->getBoolSetting("ShowManualIcon");
 	mShowSaveStates = system->getBoolSetting("ShowSaveStates");
 
-	mShowGunIcon = system->getName() != "lightgun" && system->getBoolSetting("ShowGunIconOnGames");
-	mShowWheelIcon = system->getName() != "wheel" && system->getBoolSetting("ShowWheelIconOnGames");
-	mShowTrackballIcon = system->getName() != "trackball" && system->getBoolSetting("ShowTrackballIconOnGames");
-	mShowSpinnerIcon = system->getName() != "spinner" && system->getBoolSetting("ShowSpinnerIconOnGames");
+	// Skip controller type detection if disabled globally (for handheld devices)
+	bool controllerDetectionEnabled = Settings::getInstance()->getBool("ControllerTypeDetection");
+
+	mShowGunIcon = controllerDetectionEnabled && system->getName() != "lightgun" && system->getBoolSetting("ShowGunIconOnGames");
+	mShowWheelIcon = controllerDetectionEnabled && system->getName() != "wheel" && system->getBoolSetting("ShowWheelIconOnGames");
+	mShowTrackballIcon = controllerDetectionEnabled && system->getName() != "trackball" && system->getBoolSetting("ShowTrackballIconOnGames");
+	mShowSpinnerIcon = controllerDetectionEnabled && system->getName() != "spinner" && system->getBoolSetting("ShowSpinnerIconOnGames");
 
 	mShowFlags = system->getShowFlags();
 	mShowTags = system->getShowTags();

@@ -487,17 +487,21 @@ std::string FileData::getlaunchCommand(LaunchGameOptions& options, bool includeC
 	// must really;-) be done before window->deinit while it closes joysticks
 	std::string controllersConfig = InputManager::getInstance()->configureEmulators();
 
-	if (gameToUpdate->isLightGunGame())
-		controllersConfig = controllersConfig + "-lightgun ";
+	// Skip controller type detection if disabled globally (for handheld devices)
+	if (Settings::getInstance()->getBool("ControllerTypeDetection"))
+	{
+		if (gameToUpdate->isLightGunGame())
+			controllersConfig = controllersConfig + "-lightgun ";
 
-        if (gameToUpdate->isWheelGame())
-		controllersConfig = controllersConfig + "-wheel ";
+		if (gameToUpdate->isWheelGame())
+			controllersConfig = controllersConfig + "-wheel ";
 
-        if (gameToUpdate->isTrackballGame())
-		controllersConfig = controllersConfig + "-trackball ";
+		if (gameToUpdate->isTrackballGame())
+			controllersConfig = controllersConfig + "-trackball ";
 
-        if (gameToUpdate->isSpinnerGame())
-		controllersConfig = controllersConfig + "-spinner ";
+		if (gameToUpdate->isSpinnerGame())
+			controllersConfig = controllersConfig + "-spinner ";
+	}
 
 	std::string systemName = system->getName();
 	std::string emulator = getEmulator();

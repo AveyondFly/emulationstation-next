@@ -396,7 +396,7 @@ std::string FileFilterIndex::getIndexableKey(FileData* game, FilterIndexType typ
 		if (game->getType() != GAME)
 			return "FALSE";
 
-		return game->isLightGunGame() ? "TRUE" : "FALSE";
+		return (Settings::getInstance()->getBool("ControllerTypeDetection") && game->isLightGunGame()) ? "TRUE" : "FALSE";
 	}
 
 	case WHEEL_FILTER:
@@ -407,7 +407,7 @@ std::string FileFilterIndex::getIndexableKey(FileData* game, FilterIndexType typ
 		if (game->getType() != GAME)
 			return "FALSE";
 
-		return game->isWheelGame() ? "TRUE" : "FALSE";
+		return (Settings::getInstance()->getBool("ControllerTypeDetection") && game->isWheelGame()) ? "TRUE" : "FALSE";
 	}
 
 	case TRACKBALL_FILTER:
@@ -418,7 +418,7 @@ std::string FileFilterIndex::getIndexableKey(FileData* game, FilterIndexType typ
 		if (game->getType() != GAME)
 			return "FALSE";
 
-		return game->isTrackballGame() ? "TRUE" : "FALSE";
+		return (Settings::getInstance()->getBool("ControllerTypeDetection") && game->isTrackballGame()) ? "TRUE" : "FALSE";
 	}
 
 	case SPINNER_FILTER:
@@ -429,7 +429,7 @@ std::string FileFilterIndex::getIndexableKey(FileData* game, FilterIndexType typ
 		if (game->getType() != GAME)
 			return "FALSE";
 
-		return game->isSpinnerGame() ? "TRUE" : "FALSE";
+		return (Settings::getInstance()->getBool("ControllerTypeDetection") && game->isSpinnerGame()) ? "TRUE" : "FALSE";
 	}
 
 	case VERTICAL_FILTER:

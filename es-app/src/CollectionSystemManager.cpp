@@ -1025,16 +1025,16 @@ void CollectionSystemManager::populateAutoCollection(CollectionSystemData* sysDa
 				include = game->isVerticalArcadeGame();
 				break;
 			case AUTO_LIGHTGUN:
-				include = game->isLightGunGame();
+				include = Settings::getInstance()->getBool("ControllerTypeDetection") && game->isLightGunGame();
 				break;
 			case AUTO_WHEEL:
-				include = game->isWheelGame();
+				include = Settings::getInstance()->getBool("ControllerTypeDetection") && game->isWheelGame();
 				break;
 			case AUTO_TRACKBALL:
-				include = game->isTrackballGame();
+				include = Settings::getInstance()->getBool("ControllerTypeDetection") && game->isTrackballGame();
 				break;
 			case AUTO_SPINNER:
-				include = game->isSpinnerGame();
+				include = Settings::getInstance()->getBool("ControllerTypeDetection") && game->isSpinnerGame();
 				break;
 			case AUTO_RETROACHIEVEMENTS:
 				include = game->hasCheevos();

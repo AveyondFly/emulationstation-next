@@ -168,17 +168,17 @@ void Settings::setDefaults()
     mStringMap["INPUT P3"] = "DEFAULT";
     mStringMap["INPUT P4"] = "DEFAULT";
     mStringMap["INPUT P5"] = "DEFAULT";
-    mStringMap["Overclock"] = "none";
-
-	mBoolMap["VSync"] = Settings::_VSync;
-	mStringMap["FolderViewMode"] = "always";
-	mStringMap["HiddenSystems"] = "";
-	mStringMap["SystemConfigMode"] = "full";
-
-	mBoolMap["ZaparooEnabled"] = false;
-
-	mBoolMap["PublicWebAccess"] = false;	
-	mBoolMap["FirstJoystickOnly"] = false;
+    	mStringMap["Overclock"] = "none";
+    
+    	mBoolMap["VSync"] = Settings::_VSync;
+    	mStringMap["FolderViewMode"] = "always";
+    	mStringMap["HiddenSystems"] = "";
+    	mStringMap["SystemConfigMode"] = "full";
+    
+    	mBoolMap["ZaparooEnabled"] = false;
+    	mBoolMap["ControllerTypeDetection"] = false;
+    
+    	mBoolMap["PublicWebAccess"] = false;	mBoolMap["FirstJoystickOnly"] = false;
     mBoolMap["EnableSounds"] = false;
 	mBoolMap["ShowHelpPrompts"] = true;
 	mBoolMap["ScrapeRatings"] = true;
