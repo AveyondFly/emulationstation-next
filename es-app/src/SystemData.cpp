@@ -1054,6 +1054,18 @@ SystemData* SystemData::loadSystem(pugi::xml_node system, bool fullMode)
 
 	SystemMetadata md;
 	md.name = system.child("name").text().get();
+
+	// Skip loading hidden systems at startup to improve performance
+	// They will be loaded when user unhides them (triggers reloadSystems)
+	if (fullMode)
+	{
+		auto hiddenSystems = Settings::getInstance()->getHiddenSystems();
+		if (hiddenSystems.find(md.name) != hiddenSystems.cend())
+		{
+			LOG(LogDebug) << "Skipping hidden system: " << md.name;
+			return nullptr;
+		}
+	}
 	md.fullName = system.child("fullname").text().get();
 	md.manufacturer = system.child("manufacturer").text().get();
 	md.releaseYear = Utils::String::toInteger(system.child("release").text().get());
