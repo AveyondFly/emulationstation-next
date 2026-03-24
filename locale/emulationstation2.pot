@@ -3885,3 +3885,563 @@ msgstr ""
 
 msgid "NO, IGNORE"
 msgstr ""
+
+msgid "SYSTEMS CONFIGURATION MODE"
+msgstr ""
+
+msgid "FULL"
+msgstr ""
+
+msgid "LITE"
+msgstr ""
+
+msgid "Lite mode uses a simplified system list for faster boot. Requires restart to take effect."
+msgstr ""
+
+msgid "RESTART EMULATIONSTATION TO APPLY THE NEW SYSTEMS CONFIGURATION"
+msgstr ""
+
+msgid "AGREE"
+msgstr ""
+
+msgid "A valid account is required. Please register an account on https://retroachievements.org"
+msgstr ""
+
+msgid "ANALOG STICKS LEDS"
+msgstr ""
+
+msgid "APPLY"
+msgstr ""
+
+msgid "QUIT CURRENT GAME"
+msgstr ""
+
+msgid "UPDATE MOONLIGHT GAMES"
+msgstr ""
+
+msgid "Unable to connect to server"
+msgstr ""
+
+msgid "PAIR WITH SERVER"
+msgstr ""
+
+msgid "Succesfully paired with server"
+msgstr ""
+
+msgid "UNPAIR WITH SERVER"
+msgstr ""
+
+msgid "Unpaired and settings cleared"
+msgstr ""
+
+msgid "Unpaired from server"
+msgstr ""
+
+msgid "SERVER IP"
+msgstr ""
+
+msgid "PAIRING PIN"
+msgstr ""
+
+msgid "JOIN A NETPLAY GAME"
+msgstr ""
+
+msgid "NETPLAY NICKNAME"
+msgstr ""
+
+msgid "NETPLAY HOST"
+msgstr ""
+
+msgid "NETPLAY PORT"
+msgstr ""
+
+msgid "THIS WILL DELETE THE ACTUAL GAME FILE(S)!
+ARE YOU SURE?"
+msgstr ""
+
+msgid "IN ORDER TO WRITE THE LAUNCH COMMAND FOR
+'%s'
+PRESS THE WRITE BUTTON AND THEN PLACE AN NFC TAG ON THE WRITER"
+msgstr ""
+
+msgid "SELECT FAVORITE SONGS"
+msgstr ""
+
+msgid "SCRAPE TITLESHOT"
+msgstr ""
+
+msgid "SCRAPE CARTRIDGE"
+msgstr ""
+
+msgid "BACKGROUND AUDIO"
+msgstr ""
+
+msgid "START RECORDING"
+msgstr ""
+
+msgid "STOP RECORDING"
+msgstr ""
+
+msgid "KEYBOARD TOGGLE"
+msgstr ""
+
+msgid "SYSTEM MANAGEMENT AND RESET"
+msgstr ""
+
+msgid "BACKUP CONFIGURATIONS"
+msgstr ""
+
+msgid "WARNING THIS WILL RESTART EMULATIONSTATION!
+
+AFTER THE SCRIPT IS DONE REMEMBER TO COPY THE FILE /storage/roms/backup/ROCKNIX_BACKUP.zip TO SOME PLACE SAFE OR IT WILL BE DELETED ON NEXT REBOOT!
+
+BACKUP CURRENT CONFIG AND RESTART?"
+msgstr ""
+
+msgid "RESTORE FROM BACKUP"
+msgstr ""
+
+msgid "WARNING THIS WILL REBOOT YOUR DEVICE!
+
+YOUR EXISTING CONFIGURATION WILL BE OVERWRITTEN!
+
+RESTORE FROM BACKUP AND RESTART?"
+msgstr ""
+
+msgid "EMULATOR MANAGEMENT"
+msgstr ""
+
+msgid "RESET RETROARCH CONFIG TO DEFAULT"
+msgstr ""
+
+msgid "WARNING: RETROARCH CONFIG WILL RESET TO DEFAULT
+
+PER-CORE CONFIGURATIONS WILL NOT BE AFFECTED AND NO BACKUP WILL BE CREATED!
+
+RESET RETROARCH CONFIG TO DEFAULT?"
+msgstr ""
+
+msgid "RESET OVERLAYS (CORES, CHEATS, JOYPADS, ETC)"
+msgstr ""
+
+msgid "WARNING: ALL CUSTOM RETROARCH OVERLAYS WILL BE REMOVED
+
+CUSTOM CORES, JOYSTICKS, CHEATS, ETC. NO BACKUP WILL BE CREATED!
+
+RESET RETROARCH OVERLAYS TO DEFAULT?"
+msgstr ""
+
+msgid "FULLY RESET RETROARCH"
+msgstr ""
+
+msgid "WARNING: RETROARCH AND ALL USER SAVED CONFIGURATIONS WILL RESET TO DEFAULT
+
+PER-CORE CONFIGURATIONS WILL BE REMOVED AND NO BACKUP WILL BE CREATED!
+
+RESET RETROARCH?"
+msgstr ""
+
+msgid "RESET MEDNAFEN CONFIG TO DEFAULT"
+msgstr ""
+
+msgid "WARNING: MEDNAFEN CONFIG WILL RESET TO DEFAULT
+
+NO BACKUP WILL BE CREATED!
+
+RESET MEDNAFEN CONFIG TO DEFAULT?"
+msgstr ""
+
+msgid "RESET STANDALONE EMULATOR CONFIGS TO DEFAULT"
+msgstr ""
+
+msgid "WARNING: STANDALONE EMULATOR CONFIGS WILL RESET TO DEFAULT
+
+NO BACKUP WILL BE CREATED!
+
+RESET STANDALONE EMULATOR CONFIGS TO DEFAULT?"
+msgstr ""
+
+msgid "FULLY RESET PORTMASTER"
+msgstr ""
+
+msgid "WARNING: PORTMASTER WILL RESET TO DEFAULT
+
+NO BACKUP WILL BE CREATED!
+
+RESET RESET PORTMASTER TO DEFAULT?"
+msgstr ""
+
+msgid "SYSTEM MANAGEMENT"
+msgstr ""
+
+msgid "AUDIO RESET"
+msgstr ""
+
+msgid "WARNING: AUDIO SETTINGS WILL BE RESET TO DEFAULTS AND THE SYSTEM WILL REBOOT!
+
+RESET AUDIO AND RESTART?"
+msgstr ""
+
+msgid "FACTORY RESET"
+msgstr ""
+
+msgid "WARNING: YOUR DATA AND ALL OTHER CONFIGURATIONS WILL BE RESET TO DEFAULTS!
+
+IF YOU WANT TO KEEP YOUR SETTINGS MAKE A BACKUP AND SAVE IT ON AN EXTERNAL DRIVE BEFORE RUNING THIS OPTION!
+
+EJECT YOUR GAME CARD BEFORE PROCEEDING!
+
+RESET SYSTEM AND RESTART?"
+msgstr ""
+
+msgid "THE USER INTERFACE MODE IS NOW UNLOCKED"
+msgstr ""
+
+msgid "Whether to show or hide game filtering related settings in the view options."
+msgstr ""
+
+msgid "If no image is specified in the gamelist, try to find media with the same filename to use."
+msgstr ""
+
+msgid "Switches to short-press North for Savestates & long-press South button for Game Options"
+msgstr ""
+
+msgid "Reduces lag when entering gamelists from the system menu, increases boot time"
+msgstr ""
+
+msgid "Reduces lag when scrolling through a fully scraped gamelist, increases boot time"
+msgstr ""
+
+msgid "FORCE NEXT UPDATE"
+msgstr ""
+
+msgid "UPDATE BRANCH"
+msgstr ""
+
+msgid "Select the physical keyboard layout. A reboot may be required for changes to take full effect."
+msgstr ""
+
+msgid "TIMEZONE"
+msgstr ""
+
+msgid "You are changing the user interface to a restricted mode:
+This will hide most menu options to prevent changes to the system.
+To unlock and return to the full user interface, enter this code:"
+msgstr ""
+
+msgid "ENABLE MANGOHUD OVERLAY"
+msgstr ""
+
+msgid "ENABLE TOUCHSCREEN KEYBOARD"
+msgstr ""
+
+msgid "ENABLE ROCKNIX SCREENSHOT"
+msgstr ""
+
+msgid "SCREEN BRIGHTNESS"
+msgstr ""
+
+msgid "DISPLAY MODE"
+msgstr ""
+
+msgid "DISABLE POWER LED"
+msgstr ""
+
+msgid "LED COLOR"
+msgstr ""
+
+msgid "MAX"
+msgstr ""
+
+msgid "MID"
+msgstr ""
+
+msgid "MIN"
+msgstr ""
+
+msgid "ANALOG STICKS LED COLOR"
+msgstr ""
+
+msgid "THIS DEVICE IS"
+msgstr ""
+
+msgid "Device will be switched on next reboot"
+msgstr ""
+
+msgid "Reboot now"
+msgstr ""
+
+msgid "later"
+msgstr ""
+
+msgid "AUTODETECT GAMES CARD"
+msgstr ""
+
+msgid "ENABLE MERGED STORAGE"
+msgstr ""
+
+msgid "MERGED STORAGE PRIMARY CARD"
+msgstr ""
+
+msgid "EXTERNAL"
+msgstr ""
+
+msgid "WARNING: CHANGING THE PRIMARY CARD CAN CAUSE ACCESS TO GAMES TO BE LOST, REQUIRING MANUAL INTERVENTION TO CORRECT. CONTINUE?"
+msgstr ""
+
+msgid "EJECT MICROSD CARD"
+msgstr ""
+
+msgid "You may now remove the card."
+msgstr ""
+
+msgid "PERFORMANCE"
+msgstr ""
+
+msgid "COOLING PROFILE"
+msgstr ""
+
+msgid "QUIET"
+msgstr ""
+
+msgid "MODERATE"
+msgstr ""
+
+msgid "AGGRESSIVE"
+msgstr ""
+
+msgid "DEFAULT SCALING GOVERNOR"
+msgstr ""
+
+msgid "GPU PERFORMANCE PROFILE"
+msgstr ""
+
+msgid "Balanced"
+msgstr ""
+
+msgid "Battery Focus"
+msgstr ""
+
+msgid "Best Performance"
+msgstr ""
+
+msgid "ENABLE CPU OVERCLOCK"
+msgstr ""
+
+msgid "GPU OVERCLOCK SPEED"
+msgstr ""
+
+msgid "650 MHZ"
+msgstr ""
+
+msgid "700 MHZ"
+msgstr ""
+
+msgid "750 MHZ"
+msgstr ""
+
+msgid "800 MHZ"
+msgstr ""
+
+msgid "ENABLE GPU OVERCLOCK"
+msgstr ""
+
+msgid "GPU DRIVER"
+msgstr ""
+
+msgid "GPU driver will be switched on next reboot"
+msgstr ""
+
+msgid "TWEAKS"
+msgstr ""
+
+msgid "SUSPEND"
+msgstr ""
+
+msgid "DEVICE SUSPEND MODE"
+msgstr ""
+
+msgid "SHUTDOWN DELAY"
+msgstr ""
+
+msgid "SHUTDOWN DELAY (IN GAME)"
+msgstr ""
+
+msgid "ENABLE CORE PARKING"
+msgstr ""
+
+msgid "ENABLE DPMS"
+msgstr ""
+
+msgid "Automatically decrease frame delay temporarily to prevent frame drops. Can introduce stuttering."
+msgstr ""
+
+msgid "Don't deviate from core requested timing. G-Sync, FreeSync, HDMI 2.1 VRR."
+msgstr ""
+
+msgid "SYSTEM OPTIONS"
+msgstr ""
+
+msgid "CORES USED"
+msgstr ""
+
+msgid "LITTLE"
+msgstr ""
+
+msgid "CPU SCALING GOVERNOR"
+msgstr ""
+
+msgid "MANGOHUD OVERLAY"
+msgstr ""
+
+msgid "MOONLIGHT GAME STREAMING"
+msgstr ""
+
+msgid "Sets the display's resolution. Does not affect the rendering resolution."
+msgstr ""
+
+msgid "CONTROL OPTIONS"
+msgstr ""
+
+msgid "DISABLE TOUCHSCREEN IN EMULATIONSTATION"
+msgstr ""
+
+msgid "SHOW VIDEO PREVIEWS"
+msgstr ""
+
+msgid "ENABLE AUDIBLE BATTERY WARNING"
+msgstr ""
+
+msgid "BATTERY WARNING THRESHOLD"
+msgstr ""
+
+msgid "ENABLE WIFI GPIO"
+msgstr ""
+
+msgid "LOCAL PLAY MODE"
+msgstr ""
+
+msgid "LOCAL PLAY ID"
+msgstr ""
+
+msgid "1 (HOST)"
+msgstr ""
+
+msgid "2 (CLIENT 1)"
+msgstr ""
+
+msgid "3 (CLIENT 2)"
+msgstr ""
+
+msgid "4 (CLIENT 3)"
+msgstr ""
+
+msgid "LOCAL NETWORK CHANNEL"
+msgstr ""
+
+msgid "NETWORK SERVICES"
+msgstr ""
+
+msgid "ENABLE SSH"
+msgstr ""
+
+msgid "ENABLE SAMBA"
+msgstr ""
+
+msgid "ENABLE SIMPLE HTTP SERVER"
+msgstr ""
+
+msgid "USB GADGET FUNCTION"
+msgstr ""
+
+msgid "USB Networking enabled, the device IP is "
+msgstr ""
+
+msgid "CLOUD SERVICES"
+msgstr ""
+
+msgid "ENABLE SYNCTHING"
+msgstr ""
+
+msgid "MOUNT CLOUD DRIVE"
+msgstr ""
+
+msgid "VPN SERVICES"
+msgstr ""
+
+msgid "WIREGUARD VPN"
+msgstr ""
+
+msgid "TAILSCALE VPN"
+msgstr ""
+
+msgid "ZeroTier One"
+msgstr ""
+
+msgid "TAILSCALE REAUTHENTICATE:
+"
+msgstr ""
+
+msgid "RESTART EMULATIONSTATION"
+msgstr ""
+
+msgid "REALLY RESTART EMULATIONSTATION?"
+msgstr ""
+
+msgid "GROUP UNTHEMED CUSTOM COLLECTIONS"
+msgstr ""
+
+msgid "SORT CUSTOM COLLECTIONS AND SYSTEMS"
+msgstr ""
+
+msgid "Shows icons in the bottom right corner when eligible achievements can be earned."
+msgstr ""
+
+msgid "LED NOTIFICATIONS"
+msgstr ""
+
+msgid "HOST"
+msgstr ""
+
+msgid "SOME FILES YOU LINKED ARE LOCATED OUTSIDE THE GAMELIST PATH.
+DO YOU WANT TO USE A COPY OF THESE FILES RELATIVE TO THE GAMELIST ?"
+msgstr ""
+
+msgid "JOYSTICK MAPPING"
+msgstr ""
+
+msgid "YOU ARE CURRENTLY USING VERSION %s
+DO YOU WANT TO UPDATE TO VERSION %s?"
+msgstr ""
+
+msgid "UNOFFICIAL SYSTEM MODIFICATIONS DETECTED.
+UPGRADING COULD BREAK YOUR SYSTEM.
+DO YOU WANT TO UPDATE TO VERSION %s?"
+msgstr ""
+
+msgid "AUTOCONFIGURE RETROARCH HOTKEYS"
+msgstr ""
+
+msgid "ENABLE RUMBLE"
+msgstr ""
+
+msgid "WARNING: THE EMULATOR/CORE CURRENTLY SET DOES NOT SUPPORT THIS GAME'S FILE FORMAT.
+DO YOU WANT TO LAUNCH IT ANYWAY?"
+msgstr ""
+
+msgid "WARNING: THE SYSTEM HAS MISSING BIOS FILE(S) AND THE GAME MAY NOT WORK CORRECTLY.
+DO YOU WANT TO LAUNCH IT ANYWAY?"
+msgstr ""
+
+msgid "Parent folder"
+msgstr ""
+
+msgid "Now playing: "
+msgstr ""
+
+msgid "CALIBRATING GUN
+Fire on targets to calibrate"
+msgstr ""
+
+msgid "NO HOTKEY BUTTON HAS BEEN ASSIGNED. THIS IS REQUIRED FOR EXITING GAMES WITH A CONTROLLER. DO YOU WANT TO USE THE SELECT BUTTON AS YOUR HOTKEY?"
+msgstr ""
