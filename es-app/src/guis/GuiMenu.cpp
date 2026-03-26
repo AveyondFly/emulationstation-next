@@ -1992,7 +1992,7 @@ void GuiMenu::openSystemSettings()
 	std::string selectedGpuGovernor = SystemConf::getInstance()->get("system.gpuperf");
 	
 	if (selectedGpuGovernor.empty())
-		selectedGpuGovernor = "ondemand";
+		selectedGpuGovernor = "default";
 	
 	bool selectedGpuGovernorFound = false;
 	
@@ -2004,7 +2004,7 @@ void GuiMenu::openSystemSettings()
 	}
 	
 	if (!selectedGpuGovernorFound)
-		optionsGpuGovernors->add(selectedGpuGovernor, selectedGpuGovernor, true);
+		optionsGpuGovernors->selectFirstItem(); // Preselect 'default' 
 
 	s->addWithLabel(_("DEFAULT GPU SCALING GOVERNOR"), optionsGpuGovernors);
 	s->addSaveFunc([selectedGpuGovernor, optionsGpuGovernors]
@@ -2939,9 +2939,10 @@ void GuiMenu::openSystemOptionsConfiguration(Window* mWindow, std::string config
 		if (selectedGpuGovernor == (*it))
 			selectedGpuGovernorFound = true;
 	}
-	if (!selectedGpuGovernorFound)
-		optionsGpuGovernors->add(selectedGpuGovernor, selectedGpuGovernor, true);
 
+	if (!selectedGpuGovernorFound)
+		optionsGpuGovernors->selectFirstItem(); // Preselect 'default' 
+	
 	guiSystemOptions->addWithLabel(_("GPU SCALING GOVERNOR"), optionsGpuGovernors);
 	guiSystemOptions->addSaveFunc([configName, selectedGpuGovernor, optionsGpuGovernors]
 	{
