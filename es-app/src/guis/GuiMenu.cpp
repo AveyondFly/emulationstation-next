@@ -2095,7 +2095,7 @@ void GuiMenu::openSystemSettings()
 		dtbOverlayItem(mWindow, s, "custom");
 	}
 
-#if defined(AMD64) || defined(RK3326) || defined(RK3566) || defined(RK3588) || defined(RK3399) || defined(SM8250)
+#if defined(AMD64) || defined(RK3326) || defined(RK3326S) || defined(RK3566) || defined(RK3562) || defined(RK3588) || defined(RK3399) || defined(SM8250)
 	// Allow user control over how the device sleeps - only show for devices with real suspend enabled
 	s->addGroup(_("SUSPEND"));
 	auto optionsSleep = std::make_shared<OptionListComponent<std::string> >(mWindow, _("DEVICE SUSPEND MODE"), false);
@@ -2422,7 +2422,7 @@ void GuiMenu::openSystemSettings()
 	}
 #endif
 
-#if ODROIDGOA || GAMEFORCE || RK3326
+#if ODROIDGOA || GAMEFORCE || RK3326 || RK3326S
 	// multimedia keys
 	auto multimediakeys_enabled = std::make_shared<OptionListComponent<std::string>>(mWindow, _("MULTIMEDIA KEYS"));
 	multimediakeys_enabled->add(_("AUTO"), "auto", SystemConf::getInstance()->get("system.multimediakeys.enabled") != "0" && SystemConf::getInstance()->get("system.multimediakeys.enabled") != "1");
@@ -2439,7 +2439,7 @@ void GuiMenu::openSystemSettings()
 	});
 #endif
 
-#if GAMEFORCE || RK3326
+#if GAMEFORCE || RK3326 || RK3326S
 	auto buttonColor_GameForce = std::make_shared< OptionListComponent<std::string> >(mWindow, _("BUTTON LED COLOR"));
 	buttonColor_GameForce->add(_("off"), "off", SystemConf::getInstance()->get("color_rgb") == "off" || SystemConf::getInstance()->get("color_rgb") == "");
 	buttonColor_GameForce->add(_("red"), "red", SystemConf::getInstance()->get("color_rgb") == "red");
