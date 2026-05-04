@@ -58,7 +58,8 @@ GuiRetroAchievementsSettings::GuiRetroAchievementsSettings(Window* window) : Gui
 	}
 
 #if defined(ROCKNIX)
-        if (Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_CONTROL") == "true") {
+        if (Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_CONTROL") == "true" ||
+            Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_SINGLE") == "true") {
                 // Enable LED Notifications
                 auto cheevos_led_enabled = std::make_shared<SwitchComponent>(mWindow);
                 bool cheevosledenabled = SystemConf::getInstance()->get("global.retroachievements.leds") == "1";

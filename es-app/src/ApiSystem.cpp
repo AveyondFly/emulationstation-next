@@ -773,6 +773,25 @@ std::vector<std::string> ApiSystem::getAvailableColors()
 	return executeEnumerationScript("/usr/bin/sh -lc \"/usr/bin/ledcontrol list\"");
 }
 
+std::vector<std::string> ApiSystem::getAvailableAnalogSticksLedColors()
+{
+	std::vector<std::string> raw = executeEnumerationScript("/usr/bin/sh -lc \"/usr/bin/analog_sticks_ledcontrol_single list\"");
+	std::vector<std::string> out;
+	for (auto& line : raw)
+	{
+		std::string t = Utils::String::trim(line);
+		if (t.empty())
+			continue;
+		// Device script may not implement `list` yet; ignore usage text on stdout.
+		if (Utils::String::toLower(t).find("usage") != std::string::npos)
+			continue;
+		if (Utils::String::toLower(t).find("example") != std::string::npos)
+			continue;
+		out.push_back(t);
+	}
+	return out;
+}
+
 std::vector<std::string> ApiSystem::getSleepModes()
 {
 	return executeEnumerationScript("/usr/bin/sh -lc \"echo \\\"default\\\"; tr \\\" \\\" \\\"\\n\\\" </sys/power/state | grep -v disk\"");

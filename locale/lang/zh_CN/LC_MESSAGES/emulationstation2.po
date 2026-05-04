@@ -2244,6 +2244,9 @@ msgstr "立即重启"
 msgid "later"
 msgstr "稍后"
 
+msgid "JOYSTICK LED"
+msgstr "摇杆灯"
+
 msgid "STORAGE"
 msgstr "存储"
 

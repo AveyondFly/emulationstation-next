@@ -6,7 +6,7 @@
 #include "utils/Platform.h"
 #include "utils/StringUtil.h"
 
-GuiAnalogSticksLedControls::GuiAnalogSticksLedControls(Window* window) : GuiSettings(window, _("ANALOG STICKS LEDS").c_str())
+GuiAnalogSticksLedControls::GuiAnalogSticksLedControls(Window* window) : GuiSettings(window, _("JOYSTICK LED").c_str())
 {
 	float brightness_value = 0.f;
 	float left_red_value = 0.f, left_green_value = 0.f, left_blue_value = 0.f;
@@ -74,5 +74,6 @@ GuiAnalogSticksLedControls::GuiAnalogSticksLedControls(Window* window) : GuiSett
 		
 		Utils::Platform::runSystemCommand(analogSticksLedScript + " " + buffer, "", nullptr);
 		SystemConf::getInstance()->set("analogsticks.led", buffer);
+		SystemConf::getInstance()->saveSystemConf();
 	});
 }

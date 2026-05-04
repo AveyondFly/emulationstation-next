@@ -288,6 +288,9 @@ public:
     /* LED Colors */
     std::vector<std::string> getAvailableColors();
 
+    /* Preset names from `analog_sticks_ledcontrol_single list` (DEVICE_ANALOG_STICKS_LED_SINGLE). */
+    std::vector<std::string> getAvailableAnalogSticksLedColors();
+
     /* Sleep modes */
     std::vector<std::string> getSleepModes();
 

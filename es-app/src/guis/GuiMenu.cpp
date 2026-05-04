@@ -1856,9 +1856,45 @@ void GuiMenu::openSystemSettings()
 	        });
 	}
 
-	if (Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_CONTROL") == "true"){
-		s->addEntry(_("ANALOG STICKS LED COLOR"), true, [this] { openAnalogSticksLedControls(); });
+	// Analog stick LEDs: quirk sets one mode; different env => different host script contract.
+	// DEVICE_ANALOG_STICKS_LED_SINGLE  -> `analog_sticks_ledcontrol_single list` + `<preset>`; analogsticks.led.color
+	// DEVICE_ANALOG_STICKS_LED_CONTROL -> RGB + brightness per stick (GuiAnalogSticksLedControls); analogsticks.led (seven values)
+
+	const bool analogSticksLedSingle = Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_SINGLE") == "true";
+	const bool analogSticksLedDual = Utils::Platform::GetEnv("DEVICE_ANALOG_STICKS_LED_CONTROL") == "true";
+
+	if (analogSticksLedSingle)
+	{
+		std::vector<std::string> stickPresets = ApiSystem::getInstance()->getAvailableAnalogSticksLedColors();
+		if (!stickPresets.empty())
+		{
+			auto optionsStickLed = std::make_shared<OptionListComponent<std::string>>(mWindow, _("JOYSTICK LED"), false);
+			std::string selectedStick = SystemConf::getInstance()->get("analogsticks.led.color");
+			if (selectedStick.empty())
+				selectedStick = stickPresets.front();
+			bool presetFound = false;
+			for (const auto &preset : stickPresets)
+			{
+				optionsStickLed->add(preset, preset, selectedStick == preset);
+				if (selectedStick == preset)
+					presetFound = true;
+			}
+			if (!presetFound && !selectedStick.empty())
+				optionsStickLed->add(selectedStick, selectedStick, true);
+			s->addWithLabel(_("JOYSTICK LED"), optionsStickLed);
+			s->addSaveFunc([optionsStickLed]
+			{
+				if (!optionsStickLed->changed())
+					return;
+				const std::string choice = optionsStickLed->getSelected();
+				SystemConf::getInstance()->set("analogsticks.led.color", choice);
+				Utils::Platform::runSystemCommand("/usr/bin/sh -lc \"/usr/bin/analog_sticks_ledcontrol_single " + choice + "\"", "", nullptr);
+			});
+		}
 	}
+
+	if (analogSticksLedDual)
+		s->addEntry(_("JOYSTICK LED"), true, [this] { openAnalogSticksLedControls(); });
 
 	if (Utils::Platform::GetEnv("DEVICE_DTB_SWITCH") == "true"){
 		s->addGroup(_("DEVICE"));
