@@ -32,6 +32,7 @@
 #include <SDL_events.h>
 #include <algorithm>
 #include "utils/Platform.h"
+#include "utils/FileSystemUtil.h"
 
 
 #include "SystemConf.h"
@@ -1745,7 +1746,7 @@ void GuiMenu::openSystemSettings()
 	      if(n > 1) {
 		nstr = std::to_string(n);
 	      }
-	      SystemConf::getInstance()->set("display.brightness"+nstr, std::to_string((int)Math::round(newVal)));
+	      SystemConf::getInstance()->set("system.brightness"+nstr, std::to_string((int)Math::round(newVal)));
 #endif
 	    });
 
@@ -1756,6 +1757,84 @@ void GuiMenu::openSystemSettings()
 	    s->addWithLabel(_("SCREEN BRIGHTNESS") + lnstr, brightnessComponent);
 	  }
 	}
+
+#if !WIN32
+	if (Utils::FileSystem::exists("/usr/bin/paneladj"))
+	{
+		constexpr int panelAdjStep = 5;
+		auto panelAdjPercentInit = [panelAdjStep](const std::string& key) -> float
+		{
+			const std::string raw = SystemConf::getInstance()->get(key);
+			if (raw.empty())
+				return 50.f;
+			int v = Utils::String::toInteger(raw);
+			v = Math::min(Math::max(v, 1), 100);
+			v = (int)Math::round((float)v / (float)panelAdjStep) * panelAdjStep;
+			if (v < panelAdjStep)
+				v = panelAdjStep;
+			else if (v > 100)
+				v = 100;
+			return (float)v;
+		};
+
+		s->addGroup(_("PANEL ADJUSTMENT"));
+
+		auto gamma = std::make_shared<SliderComponent>(mWindow, 5.f, 100.f, 5.f, "%");
+		gamma->setValue(panelAdjPercentInit("display.brightness"));
+		gamma->setOnValueChanged([](const float& newVal)
+		{
+			Utils::Platform::runSystemCommand(
+				"/usr/bin/sh -lc \"/usr/bin/paneladj brightness " + std::to_string((int)Math::round(newVal)) + "\"", "", nullptr);
+		});
+		s->addWithLabel(_("GAMMA"), gamma);
+		s->addSaveFunc([gamma]
+		{
+			SystemConf::getInstance()->set(
+				"display.brightness", std::to_string((int)Math::round(gamma->getValue())));
+		});
+
+		auto contrast = std::make_shared<SliderComponent>(mWindow, 5.f, 100.f, 5.f, "%");
+		contrast->setValue(panelAdjPercentInit("display.contrast"));
+		contrast->setOnValueChanged([](const float& newVal)
+		{
+			Utils::Platform::runSystemCommand(
+				"/usr/bin/sh -lc \"/usr/bin/paneladj contrast " + std::to_string((int)Math::round(newVal)) + "\"", "", nullptr);
+		});
+		s->addWithLabel(_("CONTRAST"), contrast);
+		s->addSaveFunc([contrast]
+		{
+			SystemConf::getInstance()->set(
+				"display.contrast", std::to_string((int)Math::round(contrast->getValue())));
+		});
+
+		auto saturation = std::make_shared<SliderComponent>(mWindow, 5.f, 100.f, 5.f, "%");
+		saturation->setValue(panelAdjPercentInit("display.saturation"));
+		saturation->setOnValueChanged([](const float& newVal)
+		{
+			Utils::Platform::runSystemCommand(
+				"/usr/bin/sh -lc \"/usr/bin/paneladj saturation " + std::to_string((int)Math::round(newVal)) + "\"", "", nullptr);
+		});
+		s->addWithLabel(_("SATURATION"), saturation);
+		s->addSaveFunc([saturation]
+		{
+			SystemConf::getInstance()->set(
+				"display.saturation", std::to_string((int)Math::round(saturation->getValue())));
+		});
+
+		auto hue = std::make_shared<SliderComponent>(mWindow, 5.f, 100.f, 5.f, "%");
+		hue->setValue(panelAdjPercentInit("display.hue"));
+		hue->setOnValueChanged([](const float& newVal)
+		{
+			Utils::Platform::runSystemCommand(
+				"/usr/bin/sh -lc \"/usr/bin/paneladj hue " + std::to_string((int)Math::round(newVal)) + "\"", "", nullptr);
+		});
+		s->addWithLabel(_("HUE"), hue);
+		s->addSaveFunc([hue]
+		{
+			SystemConf::getInstance()->set("display.hue", std::to_string((int)Math::round(hue->getValue())));
+		});
+	}
+#endif
 
     // Default Display mode
     std::vector<std::string> availableDisplayModes = ApiSystem::getInstance()->getAvailableDisplayModes();

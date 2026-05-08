@@ -4141,6 +4141,21 @@ msgstr ""
 msgid "SCREEN BRIGHTNESS"
 msgstr ""
 
+msgid "PANEL ADJUSTMENT"
+msgstr ""
+
+msgid "GAMMA"
+msgstr ""
+
+msgid "CONTRAST"
+msgstr ""
+
+msgid "SATURATION"
+msgstr ""
+
+msgid "HUE"
+msgstr ""
+
 msgid "DISPLAY MODE"
 msgstr ""
 

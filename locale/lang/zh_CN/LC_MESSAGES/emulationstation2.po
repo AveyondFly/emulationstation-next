@@ -2205,6 +2205,21 @@ msgstr "硬件"
 msgid "SCREEN BRIGHTNESS"
 msgstr "屏幕亮度"
 
+msgid "PANEL ADJUSTMENT"
+msgstr "面板调节"
+
+msgid "GAMMA"
+msgstr "伽马"
+
+msgid "CONTRAST"
+msgstr "对比度"
+
+msgid "SATURATION"
+msgstr "饱和度"
+
+msgid "HUE"
+msgstr "色相"
+
 msgid "DISPLAY MODE"
 msgstr "显示模式"
 

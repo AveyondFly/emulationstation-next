@@ -1661,6 +1661,21 @@ msgstr "開機時啟動 KODI"
 msgid "HARDWARE"
 msgstr "硬體"
 
+msgid "PANEL ADJUSTMENT"
+msgstr "面板調整"
+
+msgid "GAMMA"
+msgstr "伽瑪"
+
+msgid "CONTRAST"
+msgstr "對比度"
+
+msgid "SATURATION"
+msgstr "飽和度"
+
+msgid "HUE"
+msgstr "色相"
+
 msgid "Sets the display's resolution for emulationstation."
 msgstr "設定模擬器的顯示器像素"
 
