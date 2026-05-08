@@ -15,13 +15,16 @@
 
 #include <fstream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <vector>
+#include <cstdint>
 
 #ifdef WIN32
 #include <time.h>
 #else
 #include <unistd.h>
+#include <errno.h>
+#include <iconv.h>
 #endif
 
 // batocera
@@ -351,6 +354,252 @@ constexpr unsigned int sthash(const char *s, int off = 0)
 	return !s[off] ? 5381 : (sthash(s, off+1)*33) ^ s[off];
 }
 
+namespace {
+
+void appendUtf8Codepoint(std::string& s, uint32_t cp)
+{
+	if (cp <= 0x7F)
+		s.push_back((char)cp);
+	else if (cp <= 0x7FF)
+	{
+		s.push_back((char)(0xC0 | ((cp >> 6) & 0x1F)));
+		s.push_back((char)(0x80 | (cp & 0x3F)));
+	}
+	else if (cp <= 0xFFFF)
+	{
+		s.push_back((char)(0xE0 | ((cp >> 12) & 0x0F)));
+		s.push_back((char)(0x80 | ((cp >> 6) & 0x3F)));
+		s.push_back((char)(0x80 | (cp & 0x3F)));
+	}
+	else
+	{
+		s.push_back((char)(0xF0 | ((cp >> 18) & 0x07)));
+		s.push_back((char)(0x80 | ((cp >> 12) & 0x3F)));
+		s.push_back((char)(0x80 | ((cp >> 6) & 0x3F)));
+		s.push_back((char)(0x80 | (cp & 0x3F)));
+	}
+}
+
+std::string latin1BytesToUtf8(const char* data, size_t len)
+{
+	std::string out;
+	for (size_t i = 0; i < len; i++)
+	{
+		const unsigned char c = (unsigned char)data[i];
+		if (c == 0)
+			break;
+		if (c < 0x80)
+			out.push_back((char)c);
+		else
+		{
+			out.push_back((char)(0xC0 | (c >> 6)));
+			out.push_back((char)(0x80 | (c & 0x3F)));
+		}
+	}
+	return out;
+}
+
+bool isValidUtf8(const std::string& s)
+{
+	const unsigned char* b = reinterpret_cast<const unsigned char*>(s.data());
+	const size_t len = s.size();
+	for (size_t i = 0; i < len;)
+	{
+		const unsigned char c = b[i];
+		if (c <= 0x7FU)
+		{
+			++i;
+			continue;
+		}
+		if (c < 0xC0U)
+			return false;
+		if (c <= 0xDFU)
+		{
+			if (i + 1U >= len || (b[i + 1] & 0xC0U) != 0x80U)
+				return false;
+			i += 2;
+			continue;
+		}
+		if (c <= 0xEFU)
+		{
+			if (i + 2U >= len || (b[i + 1] & 0xC0U) != 0x80U || (b[i + 2] & 0xC0U) != 0x80U)
+				return false;
+			i += 3;
+			continue;
+		}
+		if (c <= 0xF4U)
+		{
+			if (i + 3U >= len || (b[i + 1] & 0xC0U) != 0x80U || (b[i + 2] & 0xC0U) != 0x80U
+			    || (b[i + 3] & 0xC0U) != 0x80U)
+				return false;
+			i += 4;
+			continue;
+		}
+		return false;
+	}
+	return true;
+}
+
+#if !defined(WIN32)
+std::string iconvBytesToUtf8(const char* fromCode, const std::string& in)
+{
+	if (in.empty())
+		return "";
+	iconv_t cd = iconv_open("UTF-8", fromCode);
+	if (cd == (iconv_t)-1)
+		return "";
+	std::vector<char> inbuf(in.begin(), in.end());
+	char* inptr = inbuf.data();
+	size_t inleft = inbuf.size();
+	std::vector<char> outbuf(in.size() * 8 + 64);
+	char* outbase = outbuf.data();
+	char* outptr = outbase;
+	size_t outleft = outbuf.size();
+
+	errno = 0;
+	if (iconv(cd, &inptr, &inleft, &outptr, &outleft) == (size_t)-1)
+	{
+		iconv_close(cd);
+		return "";
+	}
+	iconv_close(cd);
+	if (inleft != 0)
+		return "";
+	return std::string(outbase, outptr);
+}
+#else
+std::string iconvBytesToUtf8(const char* /*fromCode*/, const std::string& /*in*/)
+{
+	return "";
+}
+#endif
+
+bool localeUsesChineseId3EncodingFallback()
+{
+	const std::string lang = SystemConf::getInstance()->get("system.language");
+	if (lang.size() < 2)
+		return false;
+	const unsigned char a = (unsigned char)lang[0];
+	const unsigned char b = (unsigned char)lang[1];
+	return (a == 'z' || a == 'Z') && (b == 'h' || b == 'H');
+}
+
+std::string decodeLegacyId3Text(const std::string& raw)
+{
+	if (raw.empty())
+		return "";
+	if (isValidUtf8(raw))
+		return raw;
+#if !defined(WIN32)
+	if (localeUsesChineseId3EncodingFallback())
+	{
+		std::string fromGb = iconvBytesToUtf8("GB18030//IGNORE", raw);
+		if (fromGb.empty())
+			fromGb = iconvBytesToUtf8("GB18030", raw);
+		if (!fromGb.empty() && isValidUtf8(fromGb))
+			return fromGb;
+	}
+#endif
+	return latin1BytesToUtf8(raw.data(), raw.size());
+}
+
+std::string id3v1FieldToUtf8(const char* field, size_t maxLen)
+{
+	size_t len = maxLen;
+	while (len > 0 && (unsigned char)field[len - 1] <= 0x20U)
+		--len;
+	if (len == 0)
+		return "";
+	return decodeLegacyId3Text(std::string(field, len));
+}
+
+std::string utf16BytesToUtf8(const char* data, size_t byteLen, bool forceBigEndian)
+{
+	std::string out;
+	size_t i = 0;
+	bool bigEndian = forceBigEndian;
+	if (byteLen >= 2)
+	{
+		const unsigned char b0 = (unsigned char)data[0], b1 = (unsigned char)data[1];
+		if (b0 == 0xFF && b1 == 0xFE)
+		{
+			i = 2;
+			bigEndian = false;
+		}
+		else if (b0 == 0xFE && b1 == 0xFF)
+		{
+			i = 2;
+			bigEndian = true;
+		}
+	}
+	while (i + 1 < byteLen)
+	{
+		uint16_t u = bigEndian ? (uint16_t)(((unsigned char)data[i] << 8) | (unsigned char)data[i + 1])
+		                      : (uint16_t)((unsigned char)data[i] | ((unsigned char)data[i + 1] << 8));
+		i += 2;
+		if (u == 0)
+			break;
+		if (u >= 0xD800 && u <= 0xDBFF && i + 1 < byteLen)
+		{
+			const uint16_t low = bigEndian ? (uint16_t)(((unsigned char)data[i] << 8) | (unsigned char)data[i + 1])
+			                               : (uint16_t)((unsigned char)data[i] | ((unsigned char)data[i + 1] << 8));
+			if (low >= 0xDC00 && low <= 0xDFFF)
+			{
+				i += 2;
+				const uint32_t cp = 0x10000u + ((((uint32_t)(u - 0xD800)) << 10) | (low - 0xDC00));
+				appendUtf8Codepoint(out, cp);
+				continue;
+			}
+		}
+		appendUtf8Codepoint(out, u);
+	}
+	return out;
+}
+
+// ID3v2 text frame per encoding byte: 0 Latin-1, 1 UTF-16 BOM, 2 UTF-16BE, 3 UTF-8
+std::string id3TextContentToUtf8(ID3v2_frame_text_content* tc)
+{
+	if (tc == nullptr || tc->data == nullptr || tc->size <= 0)
+		return "";
+	const unsigned char enc = (unsigned char)tc->encoding;
+	const char* d = tc->data;
+	const size_t n = (size_t)tc->size;
+
+	switch (enc)
+	{
+		case 0:
+		{
+			size_t end = n;
+			for (size_t j = 0; j < n; j++)
+				if (d[j] == '\0')
+				{
+					end = j;
+					break;
+				}
+			return decodeLegacyId3Text(std::string(d, end));
+		}
+		case 3:
+		{
+			size_t end = n;
+			for (size_t j = 0; j < n; j++)
+				if (d[j] == '\0')
+				{
+					end = j;
+					break;
+				}
+			return std::string(d, end);
+		}
+		case 1:
+			return utf16BytesToUtf8(d, n, false);
+		case 2:
+			return utf16BytesToUtf8(d, n, true);
+		default:
+			return std::string(d, n);
+	}
+}
+
+} // namespace
+
 void AudioManager::setSongName(const std::string& song)
 {
 	if (song == mCurrentSong)
@@ -450,8 +699,6 @@ void AudioManager::playSong(const std::string& song)
 	LOG(LogDebug) << "AudioManager::setSongName";
 
 	// First let's try with an ID3 v2 tag
-#define MAX_STR_SIZE 255 // Empiric max size of a MP3 title
-
 	ID3v2_tag* tag = load_tag(song.c_str());
 	if (tag != NULL)
 	{
@@ -461,20 +708,19 @@ void AudioManager::playSong(const std::string& song)
 			ID3v2_frame_text_content* title_content = parse_text_frame_content(title_frame);
 			if (title_content != NULL && title_content->size > 0)
 			{
-				std::string song_name(title_content->data, title_content->size);
+				std::string song_name = id3TextContentToUtf8(title_content);
 				ID3v2_frame* artist_frame = tag_get_artist(tag);
 				if (artist_frame != NULL)
 				{
 					ID3v2_frame_text_content* artist_content = parse_text_frame_content(artist_frame);
 					if (artist_content != NULL && artist_content->size > 0)
 					{
-						std::string artist(artist_content->data, artist_content->size);
+						std::string artist = id3TextContentToUtf8(artist_content);
 						song_name += " - " + artist;
 						free(artist_content->data);
 						free(artist_content);
 					}
 				}
-				song_name.erase(std::remove_if(song_name.begin(), song_name.end(), [](unsigned char c) { return !Utils::String::isPrintableChar(c); }), song_name.end());
 				setSongName(song_name);
 				free(title_content->data);
 				free(title_content);
@@ -503,16 +749,20 @@ void AudioManager::playSong(const std::string& song)
 			LOG(LogError) << "Error AudioManager seeking " << song;
 		else if (fread(&info, sizeof(info), 1, file) != 1)
 			LOG(LogError) << "Error AudioManager reading " << song;
-		else if (strncmp(info.tag, "TAG", 3) == 0) 
+		else if (strncmp(info.tag, "TAG", 3) == 0)
 		{
-			std::string songTitle(info.title, 30);
-			songTitle = " - " + songTitle.substr(0, 30);
-			if (info.artist != NULL) 
-			{
-				std::string songArtist(info.artist, 30);
-				songTitle += " - " + songArtist.substr(0, 30);
-			}
-			setSongName(songTitle);
+			std::string titleU = id3v1FieldToUtf8(info.title, 30);
+			std::string artistU = id3v1FieldToUtf8(info.artist, 30);
+			std::string songLine;
+			if (!titleU.empty() && !artistU.empty())
+				songLine = titleU + " - " + artistU;
+			else if (!titleU.empty())
+				songLine = titleU;
+			else
+				songLine = artistU;
+			if (songLine.empty())
+				songLine = Utils::FileSystem::getStem(song.c_str());
+			setSongName(songLine);
 			fclose(file);
 			return;
 		}
