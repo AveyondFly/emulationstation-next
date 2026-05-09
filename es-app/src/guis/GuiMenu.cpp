@@ -2537,56 +2537,6 @@ void GuiMenu::openSystemSettings()
 	}
 #endif
 
-#if ODROIDGOA || GAMEFORCE || RK3326 || RK3326S
-	// multimedia keys
-	auto multimediakeys_enabled = std::make_shared<OptionListComponent<std::string>>(mWindow, _("MULTIMEDIA KEYS"));
-	multimediakeys_enabled->add(_("AUTO"), "auto", SystemConf::getInstance()->get("system.multimediakeys.enabled") != "0" && SystemConf::getInstance()->get("system.multimediakeys.enabled") != "1");
-	multimediakeys_enabled->add(_("ON"), "1", SystemConf::getInstance()->get("system.multimediakeys.enabled") == "1");
-	multimediakeys_enabled->add(_("OFF"), "0", SystemConf::getInstance()->get("system.multimediakeys.enabled") == "0");
-	s->addWithLabel(_("MULTIMEDIA KEYS"), multimediakeys_enabled);
-	s->addSaveFunc([this, multimediakeys_enabled, s]
-	{
-		if (multimediakeys_enabled->changed())
-		{
-			SystemConf::getInstance()->set("system.multimediakeys.enabled", multimediakeys_enabled->getSelected());
-			s->setVariable("reboot", true);
-		}
-	});
-#endif
-
-#if GAMEFORCE || RK3326 || RK3326S
-	auto buttonColor_GameForce = std::make_shared< OptionListComponent<std::string> >(mWindow, _("BUTTON LED COLOR"));
-	buttonColor_GameForce->add(_("off"), "off", SystemConf::getInstance()->get("color_rgb") == "off" || SystemConf::getInstance()->get("color_rgb") == "");
-	buttonColor_GameForce->add(_("red"), "red", SystemConf::getInstance()->get("color_rgb") == "red");
-	buttonColor_GameForce->add(_("green"), "green", SystemConf::getInstance()->get("color_rgb") == "green");
-	buttonColor_GameForce->add(_("blue"), "blue", SystemConf::getInstance()->get("color_rgb") == "blue");
-	buttonColor_GameForce->add(_("white"), "white", SystemConf::getInstance()->get("color_rgb") == "white");
-	buttonColor_GameForce->add(_("purple"), "purple", SystemConf::getInstance()->get("color_rgb") == "purple");
-	buttonColor_GameForce->add(_("yellow"), "yellow", SystemConf::getInstance()->get("color_rgb") == "yellow");
-	buttonColor_GameForce->add(_("cyan"), "cyan", SystemConf::getInstance()->get("color_rgb") == "cyan");		
-	s->addWithLabel(_("BUTTON LED COLOR"), buttonColor_GameForce);
-	s->addSaveFunc([buttonColor_GameForce] 
-	{
-		if (buttonColor_GameForce->changed()) {
-			ApiSystem::getInstance()->setButtonColorGameForce(buttonColor_GameForce->getSelected());
-			SystemConf::getInstance()->set("color_rgb", buttonColor_GameForce->getSelected());
-		}
-	});
-
-	auto powerled_GameForce = std::make_shared< OptionListComponent<std::string> >(mWindow, _("POWER LED COLOR"));
-	powerled_GameForce->add(_("heartbeat"), "heartbeat", SystemConf::getInstance()->get("option_powerled") == "heartbeat" || SystemConf::getInstance()->get("option_powerled") == "");
-	powerled_GameForce->add(_("off"), "off", SystemConf::getInstance()->get("option_powerled") == "off");
-	powerled_GameForce->add(_("on"), "on", SystemConf::getInstance()->get("option_powerled") == "on");	
-	s->addWithLabel(_("POWER LED COLOR"), powerled_GameForce);
-	s->addSaveFunc([powerled_GameForce] 
-	{
-		if (powerled_GameForce->changed()) {
-			ApiSystem::getInstance()->setPowerLedGameForce(powerled_GameForce->getSelected());
-			SystemConf::getInstance()->set("option_powerled", powerled_GameForce->getSelected());
-		}
-	});
-#endif
-
 	// Overclock choice
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::OVERCLOCK))
 	{
