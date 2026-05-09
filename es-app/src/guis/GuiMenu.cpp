@@ -1916,6 +1916,7 @@ void GuiMenu::openSystemSettings()
 		});
 	}
 
+	// ledcontrol max/mid/min (distinct from sysfs slider; see DEVICE_LED_SYSFS_BRIGHTNESS).
 	if (Utils::Platform::GetEnv("DEVICE_LED_BRIGHTNESS") == "true"){
 	        // Sets LED brightness
 	        auto optionsLEDBrightness = std::make_shared<OptionListComponent<std::string> >(mWindow, _("LED BRIGHTNESS"), false);
@@ -2667,9 +2668,15 @@ void GuiMenu::openSystemSettings()
 
 	}
 	
-	// LED brightness
+	// Sysfs LED brightness slider (ROCKNIX: opt-in via DEVICE_LED_SYSFS_BRIGHTNESS; BATOCERA: unchanged auto-detect).
 	int ledBrightness;
-	if (ApiSystem::getInstance()->getLEDBrightness(ledBrightness)) {
+#if defined(ROCKNIX)
+	const bool showLedSysfsBrightness =
+		Utils::Platform::GetEnv("DEVICE_LED_SYSFS_BRIGHTNESS") == "true";
+#else
+	const bool showLedSysfsBrightness = true;
+#endif
+	if (showLedSysfsBrightness && ApiSystem::getInstance()->getLEDBrightness(ledBrightness)) {
 		auto ledBrightnessComponent = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
 		ledBrightnessComponent->setValue(ledBrightness);
 		ledBrightnessComponent->setOnValueChanged([](const float &newVal)
