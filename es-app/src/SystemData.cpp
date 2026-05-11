@@ -339,6 +339,10 @@ void SystemData::populateFolder(FolderData* folder, std::unordered_map<std::stri
 			if (fileInfo.path.rfind("windows") != std::string::npos)
 				continue;
 
+			// Skip mkxp folder for the same reason as ports folder
+			if (fileInfo.path.rfind("mkxp") != std::string::npos)
+				continue;
+
 			FolderData* newFolder = new FolderData(filePath, this);
 			populateFolder(newFolder, fileMap);
 
