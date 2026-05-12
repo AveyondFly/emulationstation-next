@@ -2086,6 +2086,9 @@ msgstr "优化视频VRAM的使用"
 msgid "REBOOT REQUIRED TO APPLY THE NEW CONFIGURATION"
 msgstr "需要重新启动系统才能应用新配置"
 
+msgid "RESTART EMULATIONSTATION TO APPLY THE NEW CONFIGURATION"
+msgstr "需要重启 EmulationStation 才能应用新配置"
+
 msgid "DOWNLOADS"
 msgstr "下载项"
 
@@ -2973,6 +2976,30 @@ msgstr "4（客户端 3）"
 
 msgid "LOCAL NETWORK CHANNEL"
 msgstr "本地网络频道"
+
+msgid "PROXY SETTINGS"
+msgstr "代理设置"
+
+msgid "ENABLE PROXY"
+msgstr "启用代理"
+
+msgid "PROXY TYPE"
+msgstr "代理类型"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "SOCKS5"
+msgstr "SOCKS5"
+
+msgid "PROXY HOST"
+msgstr "代理主机"
+
+msgid "PROXY PORT"
+msgstr "代理端口"
+
+msgid "NO PROXY"
+msgstr "不使用代理"
 
 msgid "WIFI ENABLED"
 msgstr "WiFi 已启用"

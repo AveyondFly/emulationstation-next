@@ -3,6 +3,7 @@
 #include "utils/FileSystemUtil.h"
 #include "utils/StringUtil.h"
 #include "Log.h"
+#include "SystemConf.h"
 #include <assert.h>
 #include <thread>
 
@@ -101,6 +102,40 @@ static std::string getCookiesContainerPath(bool createDirectory = true)
 
 	return Utils::FileSystem::getGenericPath(Utils::FileSystem::combine(cookiesPath, "cookies.txt"));
 }
+
+#ifndef WIN32
+static std::string getConfiguredProxyUrl()
+{
+	auto sysConf = SystemConf::getInstance();
+	if (!sysConf->getBool("network.proxy.enabled"))
+		return "";
+
+	std::string host = Utils::String::trim(sysConf->get("network.proxy.host"));
+	if (host.empty())
+		return "";
+
+	std::string type = Utils::String::toLower(Utils::String::trim(sysConf->get("network.proxy.type")));
+	if (type != "socks5")
+		type = "http";
+
+	std::string port = Utils::String::trim(sysConf->get("network.proxy.port"));
+
+	if (host.find("://") != std::string::npos)
+		return port.empty() ? host : host + ":" + port;
+
+	if (!port.empty())
+		host += ":" + port;
+
+	return type + "://" + host;
+}
+
+static bool hasProxyConfiguration()
+{
+	auto sysConf = SystemConf::getInstance();
+	return !Utils::String::trim(sysConf->get("network.proxy.host")).empty()
+		|| !Utils::String::trim(sysConf->get("network.proxy.port")).empty();
+}
+#endif
 
 void HttpReq::resetCookies()
 {
@@ -307,6 +342,25 @@ void HttpReq::performRequest(const std::string& url, HttpReqOptions* options)
 				curl_easy_setopt(mHandle, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
 			}
 		}
+	}
+#else
+	std::string proxyServer = getConfiguredProxyUrl();
+	if (!proxyServer.empty())
+	{
+		curl_easy_setopt(mHandle, CURLOPT_PROXY, proxyServer.c_str());
+		if (Utils::String::startsWith(proxyServer, "socks5://"))
+			curl_easy_setopt(mHandle, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
+		else
+			curl_easy_setopt(mHandle, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+
+		std::string noProxy = Utils::String::trim(SystemConf::getInstance()->get("network.proxy.no_proxy"));
+		if (!noProxy.empty())
+			curl_easy_setopt(mHandle, CURLOPT_NOPROXY, noProxy.c_str());
+	}
+	else if (hasProxyConfiguration())
+	{
+		// Empty CURLOPT_PROXY disables libcurl's environment proxy for this handle.
+		curl_easy_setopt(mHandle, CURLOPT_PROXY, "");
 	}
 #endif
 	

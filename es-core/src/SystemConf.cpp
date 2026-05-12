@@ -35,6 +35,11 @@ static std::map<std::string, std::string> defaults =
 	{ "kodi.atstartup", "0" },
 	{ "audio.bgmusic", "1" },
 	{ "wifi.enabled", "0" },
+	{ "network.proxy.enabled", "0" },
+	{ "network.proxy.type", "http" },
+	{ "network.proxy.host", "" },
+	{ "network.proxy.port", "" },
+	{ "network.proxy.no_proxy", "localhost,127.0.0.1,::1" },
 	{ "system.hostname", "BATOCERA" }, // batocera
 	{ "global.retroachievements", "0" },
 	{ "global.retroachievements.hardcore", "0" },

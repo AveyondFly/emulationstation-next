@@ -5294,6 +5294,11 @@ void GuiMenu::openNetworkSettings(bool selectWifiEnable, bool selectAdhocEnable)
 #if !WIN32
 	const std::string baseCountry = SystemConf::getInstance()->get("wifi.country");
 #endif
+	const bool baseProxyEnabled = SystemConf::getInstance()->getBool("network.proxy.enabled");
+	const std::string baseProxyType = SystemConf::getInstance()->get("network.proxy.type");
+	const std::string baseProxyHost = SystemConf::getInstance()->get("network.proxy.host");
+	const std::string baseProxyPort = SystemConf::getInstance()->get("network.proxy.port");
+	const std::string baseNoProxy = SystemConf::getInstance()->get("network.proxy.no_proxy");
 
 	// Adhoc mode options
 	auto enable_adhoc = std::make_shared<SwitchComponent>(mWindow);
@@ -5457,6 +5462,29 @@ void GuiMenu::openNetworkSettings(bool selectWifiEnable, bool selectAdhocEnable)
 		openNetworkSettings(false, true);
 	});
 
+	// PROXY SETTINGS
+	s->addGroup(_("PROXY SETTINGS"));
+
+	s->addSwitch(_("ENABLE PROXY"), "network.proxy.enabled", false);
+
+	s->addOptionList(_("PROXY TYPE"), {
+		{ _("HTTP"), "http" },
+		{ _("SOCKS5"), "socks5" }
+	}, "network.proxy.type", false);
+
+	s->addInputTextConfigRow(_("PROXY HOST"), "network.proxy.host", false);
+	s->addInputTextConfigRow(_("PROXY PORT"), "network.proxy.port", false);
+	s->addInputTextConfigRow(_("NO PROXY"), "network.proxy.no_proxy", false);
+	s->addSaveFunc([s, baseProxyEnabled, baseProxyType, baseProxyHost, baseProxyPort, baseNoProxy]
+	{
+		if (baseProxyEnabled != SystemConf::getInstance()->getBool("network.proxy.enabled")
+			|| baseProxyType != SystemConf::getInstance()->get("network.proxy.type")
+			|| baseProxyHost != SystemConf::getInstance()->get("network.proxy.host")
+			|| baseProxyPort != SystemConf::getInstance()->get("network.proxy.port")
+			|| baseNoProxy != SystemConf::getInstance()->get("network.proxy.no_proxy"))
+			s->setVariable("exitreboot", true);
+	});
+
 	// NETWORK SERVICES
 	s->addGroup(_("NETWORK SERVICES"));
 
@@ -5615,6 +5643,18 @@ void GuiMenu::openNetworkSettings(bool selectWifiEnable, bool selectAdhocEnable)
 			Utils::Platform::runSystemCommand("systemctl stop zerotier-one", "", nullptr);
 		}
 		SystemConf::getInstance()->set("zerotier.up", ztEnabled ? "1" : "0");
+	});
+
+	s->onFinalize([s, window]
+	{
+		if (s->getVariable("exitreboot") && Settings::getInstance()->getBool("ExitOnRebootRequired"))
+		{
+			Utils::Platform::quitES(Utils::Platform::QuitMode::QUIT);
+			return;
+		}
+
+		if (s->getVariable("exitreboot"))
+			window->displayNotificationMessage(_U("\uF011  ") + _("RESTART EMULATIONSTATION TO APPLY THE NEW CONFIGURATION"));
 	});
 
 	mWindow->pushGui(s);

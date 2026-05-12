@@ -1553,6 +1553,9 @@ msgstr ""
 msgid "REBOOT REQUIRED TO APPLY THE NEW CONFIGURATION"
 msgstr ""
 
+msgid "RESTART EMULATIONSTATION TO APPLY THE NEW CONFIGURATION"
+msgstr ""
+
 msgid "DOWNLOADS"
 msgstr ""
 
@@ -4352,6 +4355,30 @@ msgid "4 (CLIENT 3)"
 msgstr ""
 
 msgid "LOCAL NETWORK CHANNEL"
+msgstr ""
+
+msgid "PROXY SETTINGS"
+msgstr ""
+
+msgid "ENABLE PROXY"
+msgstr ""
+
+msgid "PROXY TYPE"
+msgstr ""
+
+msgid "HTTP"
+msgstr ""
+
+msgid "SOCKS5"
+msgstr ""
+
+msgid "PROXY HOST"
+msgstr ""
+
+msgid "PROXY PORT"
+msgstr ""
+
+msgid "NO PROXY"
 msgstr ""
 
 msgid "NETWORK SERVICES"
