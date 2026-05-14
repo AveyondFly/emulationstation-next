@@ -97,8 +97,9 @@ std::vector<std::vector<const char*>> kbKr{
 };
 
 GuiTextEditPopupKeyboard::GuiTextEditPopupKeyboard(Window* window, const std::string& title, const std::string& initValue,
-	const std::function<void(const std::string&)>& okCallback, bool multiLine, const std::string acceptBtnText)
-	: GuiComponent(window), mBackground(window, ":/frame.png"), mGrid(window, Vector2i(1, 6)), mMultiLine(multiLine)
+	const std::function<void(const std::string&)>& okCallback, bool multiLine, const std::string acceptBtnText,
+	const std::string& resetValue)
+	: GuiComponent(window), mBackground(window, ":/frame.png"), mGrid(window, Vector2i(1, 6)), mMultiLine(multiLine), mResetValue(resetValue)
 {
 	setTag("popup");
 
@@ -391,7 +392,7 @@ bool GuiTextEditPopupKeyboard::input(InputConfig* config, Input input)
 
 	if (config->isMappedTo("x", input) && input.value && mOkCallback != nullptr)
 	{
-		mOkCallback(""); 
+		mOkCallback(mResetValue);
 		delete this;
 		return true;
 	}
@@ -490,7 +491,7 @@ std::shared_ptr<ButtonComponent> GuiTextEditPopupKeyboard::makeButton(const std:
 		}
 		else if (key == _("RESET"))
 		{
-			mOkCallback(""); 
+			mOkCallback(mResetValue);
 			delete this;
 			return;
 		}

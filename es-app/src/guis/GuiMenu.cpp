@@ -5603,9 +5603,18 @@ void GuiMenu::openNetworkSettings(bool selectWifiEnable, bool selectAdhocEnable)
 		{ _("SOCKS5"), "socks5" }
 	}, "network.proxy.type", false);
 
+	const std::string defaultNoProxy = "localhost,127.0.0.1,::1";
+	auto noProxyEditor = [defaultNoProxy](Window* window, std::string title, std::string value, const std::function<void(std::string)>& onsave)
+	{
+		if (Settings::getInstance()->getBool("UseOSK"))
+			window->pushGui(new GuiTextEditPopupKeyboard(window, title, value, onsave, false, "OK", defaultNoProxy));
+		else
+			window->pushGui(new GuiTextEditPopup(window, title, value, onsave, false, "OK", defaultNoProxy));
+	};
+
 	s->addInputTextConfigRow(_("PROXY HOST"), "network.proxy.host", false);
 	s->addInputTextConfigRow(_("PROXY PORT"), "network.proxy.port", false);
-	s->addInputTextConfigRow(_("NO PROXY"), "network.proxy.no_proxy", false);
+	s->addInputTextConfigRow(_("NO PROXY"), "network.proxy.no_proxy", false, false, noProxyEditor);
 	s->addSaveFunc([s, baseProxyEnabled, baseProxyType, baseProxyHost, baseProxyPort, baseNoProxy]
 	{
 		if (baseProxyEnabled != SystemConf::getInstance()->getBool("network.proxy.enabled")
