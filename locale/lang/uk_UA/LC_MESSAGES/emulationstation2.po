@@ -4519,3 +4519,10 @@ msgstr ""
 
 #~ msgid "STOP EDITING"
 #~ msgstr "ЗАВЕРШИТИ РЕДАГУВАННЯ"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

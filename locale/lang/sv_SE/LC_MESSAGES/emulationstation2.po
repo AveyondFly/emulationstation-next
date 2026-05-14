@@ -3908,3 +3908,10 @@ msgstr "JA, FORMATERA & SLÅ SAMMAN"
 
 msgid "NO, IGNORE"
 msgstr "NEJ, IGNORERA"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

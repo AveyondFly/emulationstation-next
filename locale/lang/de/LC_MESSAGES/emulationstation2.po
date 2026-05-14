@@ -3969,3 +3969,10 @@ msgstr "JA, FORMATIEREN & ZUSAMMENFÜHREN"
 
 msgid "NO, IGNORE"
 msgstr "NEIN, IGNORIEREN"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

@@ -3985,3 +3985,10 @@ msgstr ""
 
 #~ msgid "-10 for auto"
 #~ msgstr "-10 for auto"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

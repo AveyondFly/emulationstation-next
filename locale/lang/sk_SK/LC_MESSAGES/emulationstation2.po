@@ -4060,3 +4060,10 @@ msgstr "Nie, ignorovať"
 #~ "nemáte osobitné tlačidlo pre Hotkey, použite tlačidlo Select. Preskočte "
 #~ "všetky tlačidlá/páčky, ktoré nemáte držaním nejakého tlačidla. Stlačte "
 #~ "južné tlačidlo na potvrdenie, ak ste hotoví."
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

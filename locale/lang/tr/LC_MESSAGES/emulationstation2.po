@@ -3989,3 +3989,10 @@ msgstr "HAYIR, YOKSAY"
 
 #~ msgid "ACCOUNT"
 #~ msgstr "HESAP"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

@@ -3970,3 +3970,10 @@ msgstr ""
 
 #~ msgid "GROUP UNTHEMED CUSTOM COLLECTIONS"
 #~ msgstr "GROUP UNTHEMED CUSTOM COLLECTIONS"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

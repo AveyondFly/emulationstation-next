@@ -3956,3 +3956,9 @@ msgstr "OUI, FORMATER & FUSIONNER"
 msgid "NO, IGNORE"
 msgstr "NON, IGNORER"
 
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

@@ -5076,3 +5076,10 @@ msgstr ""
 
 #~ msgid "sortname"
 #~ msgstr "название для сортировки"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

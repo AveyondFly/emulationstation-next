@@ -3993,3 +3993,10 @@ msgstr ""
 
 #~ msgid "HAS MEDIAS"
 #~ msgstr "TÉ CONTINGUTS"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

@@ -4438,3 +4438,10 @@ msgstr ""
 
 #~ msgid "REALLY SHUTDOWN WITHOUT SAVING METADATAS?"
 #~ msgstr "בטוח לכבות בלי לשמור METADATA"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

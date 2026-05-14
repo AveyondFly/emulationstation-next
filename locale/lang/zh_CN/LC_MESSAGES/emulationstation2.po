@@ -2223,6 +2223,12 @@ msgstr "饱和度"
 msgid "HUE"
 msgstr "色相"
 
+msgid "HDMI DISPLAY MODE"
+msgstr "HDMI 显示模式"
+
+msgid "PANEL DISPLAY MODE"
+msgstr "面板显示模式"
+
 msgid "DISPLAY MODE"
 msgstr "显示模式"
 

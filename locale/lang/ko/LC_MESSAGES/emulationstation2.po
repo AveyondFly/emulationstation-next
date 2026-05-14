@@ -3954,3 +3954,10 @@ msgstr "아니요, 무시합니다"
 
 #~ msgid "THE USER INTERFACE MODE IS NOW UNLOCKED"
 #~ msgstr "사용자 인터페이스 모드가 사용 해제됨"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

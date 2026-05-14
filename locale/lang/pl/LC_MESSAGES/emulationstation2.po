@@ -4349,3 +4349,10 @@ msgstr "NIE, IGNORUJ"
 
 #~ msgid "LISTENING NOW"
 #~ msgstr "TERAZ SŁUCHA"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

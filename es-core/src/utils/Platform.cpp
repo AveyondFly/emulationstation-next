@@ -23,6 +23,7 @@
 #include "Paths.h"
 #include <fstream>
 #include <string>
+#include <vector>
 #include "renderers/Renderer.h"
 
 // #define DEVTEST
@@ -766,6 +767,55 @@ namespace Utils
 
 			pclose(pipe);
 			return result;
+		}
+
+		std::string getActiveWaylandDrmConnectorName()
+		{
+#if WIN32
+			return "";
+#else
+			static const std::string drmClass = "/sys/class/drm";
+			if (!Utils::FileSystem::isDirectory(drmClass))
+				return "";
+
+			std::vector<std::string> enabled;
+			for (const std::string& path : Utils::FileSystem::getDirContent(drmClass, false))
+			{
+				const std::string name = Utils::FileSystem::getFileName(path);
+				if (name.size() < 6 || name.compare(0, 4, "card") != 0)
+					continue;
+				if (name.find('-') == std::string::npos)
+					continue;
+
+				const std::string enabledPath = path + "/enabled";
+				if (!Utils::FileSystem::exists(enabledPath))
+					continue;
+
+				const std::string en = Utils::String::trim(Utils::FileSystem::readAllText(enabledPath));
+				if (en != "enabled")
+					continue;
+
+				const size_t dashPos = name.find('-');
+				if (dashPos == std::string::npos || dashPos + 1 >= name.size())
+					continue;
+
+				enabled.push_back(name.substr(dashPos + 1));
+			}
+
+			if (enabled.empty())
+				return "";
+			if (enabled.size() == 1)
+				return enabled.front();
+
+			for (const auto& c : enabled)
+				if (c.find("HDMI") != std::string::npos)
+					return c;
+			for (const auto& c : enabled)
+				if (c.find("DSI") != std::string::npos)
+					return c;
+
+			return enabled.front();
+#endif
 		}
 
 	}

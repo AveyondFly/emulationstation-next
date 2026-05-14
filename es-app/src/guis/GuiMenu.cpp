@@ -33,6 +33,7 @@
 #include <algorithm>
 #include "utils/Platform.h"
 #include "utils/FileSystemUtil.h"
+#include "utils/StringUtil.h"
 
 
 #include "SystemConf.h"
@@ -130,6 +131,104 @@
 
 #define fake_gettext_resolution_max_1K  _("maximum 1920x1080")
 #define fake_gettext_resolution_max_640 _("maximum 640x480")
+
+namespace
+{
+	static std::string shellSingleQuoteForSh(const std::string& s)
+	{
+		std::string out = "'";
+		for (char c : s)
+		{
+			if (c == '\'')
+				out += "'\\''";
+			else
+				out += c;
+		}
+		out += "'";
+		return out;
+	}
+
+	/** wlr-randr mode line: "1920x1080 px, 60.000000 Hz (current)". DSI: Hz only; HDMI/else: WxH @ rate Hz */
+	static std::string normalizeWlrRandrModeLine(const std::string& raw, bool includeResolution)
+	{
+		const std::string t = Utils::String::trim(raw);
+		size_t pxComma = t.find(" px, ");
+		size_t resEnd = pxComma;
+		size_t rateStart = std::string::npos;
+		if (pxComma != std::string::npos)
+			rateStart = pxComma + 5;
+		else
+		{
+			pxComma = t.find("px, ");
+			if (pxComma == std::string::npos)
+				return t;
+			rateStart = pxComma + 4;
+			resEnd = pxComma;
+		}
+
+		const size_t hzPos = t.find(" Hz");
+		if (hzPos == std::string::npos || rateStart == std::string::npos || hzPos <= rateStart)
+			return t;
+
+		const std::string rate = Utils::String::trim(t.substr(rateStart, hzPos - rateStart));
+		if (includeResolution)
+		{
+			const std::string res = Utils::String::trim(t.substr(0, resEnd));
+			return res + " @ " + rate + " Hz";
+		}
+		return rate + " Hz";
+	}
+
+	static std::vector<std::string> dedupeDisplayModesPreserveOrder(std::vector<std::string> modes)
+	{
+		std::vector<std::string> out;
+		out.reserve(modes.size());
+		for (const std::string& s : modes)
+		{
+			if (std::find(out.cbegin(), out.cend(), s) == out.cend())
+				out.push_back(s);
+		}
+		return out;
+	}
+
+	/**
+	 * Apply video mode immediately via wlr-randr. Does not use ROCKNIX set_refresh_rate(): that helper
+	 * always picks the first wlr-randr output (often DSI-1) and mangles "WxH @ rate Hz" with tr -cd digits.
+	 */
+	static void runApplyDisplayMode(const std::string& waylandOutput, const std::string& selection)
+	{
+		if (waylandOutput.empty())
+			return;
+
+		std::string inner = ". /storage/env.txt 2>/dev/null; ";
+
+		const size_t atPos = selection.find(" @ ");
+		if (atPos != std::string::npos)
+		{
+			const std::string res = Utils::String::trim(selection.substr(0, atPos));
+			const size_t hzPos = selection.find(" Hz", atPos);
+			if (hzPos == std::string::npos)
+				return;
+			const std::string rate = Utils::String::trim(selection.substr(atPos + 3, hzPos - atPos - 3));
+			const std::string modeSpec = res + "@" + rate + "Hz";
+			inner += "/usr/bin/wlr-randr --output " + shellSingleQuoteForSh(waylandOutput) + " --mode " + shellSingleQuoteForSh(modeSpec);
+		}
+		else
+		{
+			std::string rate;
+			const size_t hzPos = selection.find(" Hz");
+			if (hzPos != std::string::npos)
+				rate = Utils::String::trim(selection.substr(0, hzPos));
+			else
+				rate = Utils::String::trim(selection);
+
+			inner += "RES=$(/usr/bin/wlr-randr --output " + shellSingleQuoteForSh(waylandOutput) + " | awk 'f{print $1; exit}/Modes:/{f=1}'); ";
+			inner += "/usr/bin/wlr-randr --output " + shellSingleQuoteForSh(waylandOutput) + " --mode \"${RES}@" + rate + "Hz\"";
+		}
+
+		Utils::Platform::runSystemCommand("/usr/bin/sh -lc " + shellSingleQuoteForSh(inner), "", nullptr);
+	}
+}
 
 GuiMenu::GuiMenu(Window *window, bool animate) : GuiComponent(window), mMenu(window, _("MAIN MENU").c_str())
 {
@@ -1411,6 +1510,16 @@ void GuiMenu::openSystemSettings()
 	auto s = new GuiSettings(mWindow, _("SYSTEM SETTINGS").c_str());
 	bool isFullUI = UIModeController::getInstance()->isUIModeFull();
 
+#if !WIN32
+	const std::string activeDrmConnector = Utils::Platform::getActiveWaylandDrmConnectorName();
+	const bool hdmiOutputActive = activeDrmConnector.find("HDMI") != std::string::npos;
+	const bool dsiOutputActive = activeDrmConnector.find("DSI") != std::string::npos;
+#else
+	const std::string activeDrmConnector;
+	const bool hdmiOutputActive = false;
+	const bool dsiOutputActive = false;
+#endif
+
 	s->addGroup(_("SYSTEM"));
 
 	// System informations
@@ -1759,7 +1868,7 @@ void GuiMenu::openSystemSettings()
 	}
 
 #if !WIN32
-	if (Utils::FileSystem::exists("/usr/bin/paneladj"))
+	if (Utils::FileSystem::exists("/usr/bin/paneladj") && !hdmiOutputActive)
 	{
 		constexpr int panelAdjStep = 5;
 		auto panelAdjPercentInit = [panelAdjStep](const std::string& key) -> float
@@ -1837,24 +1946,39 @@ void GuiMenu::openSystemSettings()
 #endif
 
     // Default Display mode
-    std::vector<std::string> availableDisplayModes = ApiSystem::getInstance()->getAvailableDisplayModes();
+    std::vector<std::string> availableDisplayModes = ApiSystem::getInstance()->getAvailableDisplayModes(activeDrmConnector);
     if (! availableDisplayModes.empty()){
-        auto optionsDisplayModes = std::make_shared<OptionListComponent<std::string> >(mWindow, _("DISPLAY MODE"), false);
-        std::string selectedDisplayMode = SystemConf::getInstance()->get("system.display_mode");
-        for (auto it = availableDisplayModes.begin(); it != availableDisplayModes.end(); it++)
+        const bool displayModeIncludeResolution = !dsiOutputActive;
+        const std::string displayModeLabel = hdmiOutputActive ? _("HDMI DISPLAY MODE") :
+            (dsiOutputActive ? _("PANEL DISPLAY MODE") : _("DISPLAY MODE"));
+        auto optionsDisplayModes = std::make_shared<OptionListComponent<std::string> >(mWindow, displayModeLabel.c_str(), false);
+        const std::string displayModeConfKey = hdmiOutputActive ? "system.display_mode_hdmi" : "system.display_mode";
+        std::string selectedDisplayMode = SystemConf::getInstance()->get(displayModeConfKey);
+        if (selectedDisplayMode.empty())
         {
-            if (selectedDisplayMode.empty() && ((*it).find("preferred") != std::string::npos))
+            for (const std::string& raw : availableDisplayModes)
             {
-                (*it) = (*it).substr((*it).find("px, ") + 4);
-                (*it) = (*it).substr(0, (*it).find(" Hz") + 3);
-                selectedDisplayMode = (*it);
-                continue;
+                if (raw.find("preferred") != std::string::npos)
+                {
+                    selectedDisplayMode = normalizeWlrRandrModeLine(raw, displayModeIncludeResolution);
+                    break;
+                }
             }
-
-            // Remove resolution at start, and any trailing markers, e.g. "preferred" or  "current"
-            (*it) = (*it).substr((*it).find("px, ") + 4);
-            (*it) = (*it).substr(0, (*it).find(" Hz") + 3);
         }
+        if (selectedDisplayMode.empty())
+        {
+            for (const std::string& raw : availableDisplayModes)
+            {
+                if (raw.find("current") != std::string::npos)
+                {
+                    selectedDisplayMode = normalizeWlrRandrModeLine(raw, displayModeIncludeResolution);
+                    break;
+                }
+            }
+        }
+        for (auto it = availableDisplayModes.begin(); it != availableDisplayModes.end(); ++it)
+            *it = normalizeWlrRandrModeLine(*it, displayModeIncludeResolution);
+        availableDisplayModes = dedupeDisplayModesPreserveOrder(std::move(availableDisplayModes));
         bool cfound = false;
         for (auto it = availableDisplayModes.begin(); it != availableDisplayModes.end(); it++)
         {
@@ -1866,14 +1990,14 @@ void GuiMenu::openSystemSettings()
         if (!cfound)
             optionsDisplayModes->add(selectedDisplayMode, selectedDisplayMode, true);
 
-        s->addWithLabel(_("DISPLAY MODE"), optionsDisplayModes);
-        s->addSaveFunc([selectedDisplayMode, optionsDisplayModes]
+        s->addWithLabel(displayModeLabel, optionsDisplayModes);
+        s->addSaveFunc([selectedDisplayMode, optionsDisplayModes, displayModeConfKey, activeDrmConnector]
         {
             if (optionsDisplayModes->changed())
             {
-                SystemConf::getInstance()->set("system.display_mode", optionsDisplayModes->getSelected());
+                SystemConf::getInstance()->set(displayModeConfKey, optionsDisplayModes->getSelected());
                 SystemConf::getInstance()->saveSystemConf();
-                Utils::Platform::runSystemCommand("/usr/bin/sh -lc \". /etc/profile.d/010-wlr-randr; set_refresh_rate "+ optionsDisplayModes->getSelected() + "\"", "", nullptr);
+                runApplyDisplayMode(activeDrmConnector, optionsDisplayModes->getSelected());
             }
         });
     }
@@ -2936,6 +3060,16 @@ void GuiMenu::openSystemOptionsConfiguration(Window* mWindow, std::string config
 	GuiSettings* guiSystemOptions = new GuiSettings(mWindow, _("SYSTEM OPTIONS").c_str());
 	bool cfound = false;
 
+#if !WIN32
+	const std::string activeDrmConnector = Utils::Platform::getActiveWaylandDrmConnectorName();
+	const bool hdmiOutputActive = activeDrmConnector.find("HDMI") != std::string::npos;
+	const bool dsiOutputActive = activeDrmConnector.find("DSI") != std::string::npos;
+#else
+	const std::string activeDrmConnector;
+	const bool hdmiOutputActive = false;
+	const bool dsiOutputActive = false;
+#endif
+
 #if defined(S922X) || defined(RK3588) || defined(RK3399) || defined(SM8250) || defined(SM8550)
 	// Core chooser
 	auto cores_used = std::make_shared<OptionListComponent<std::string>>(mWindow, _("CORES USED"));
@@ -3034,23 +3168,20 @@ void GuiMenu::openSystemOptionsConfiguration(Window* mWindow, std::string config
 #endif
 
     // Per game/core/emu Display mode
-    std::vector<std::string> availableDisplayModes = ApiSystem::getInstance()->getAvailableDisplayModes();
+    std::vector<std::string> availableDisplayModes = ApiSystem::getInstance()->getAvailableDisplayModes(activeDrmConnector);
     if (! availableDisplayModes.empty()){
-        auto optionsDisplayModes = std::make_shared<OptionListComponent<std::string> >(mWindow, _("DISPLAY MODE"), false);
+        const bool displayModeIncludeResolution = !dsiOutputActive;
+        const std::string displayModeLabel = hdmiOutputActive ? _("HDMI DISPLAY MODE") :
+            (dsiOutputActive ? _("PANEL DISPLAY MODE") : _("DISPLAY MODE"));
+        auto optionsDisplayModes = std::make_shared<OptionListComponent<std::string> >(mWindow, displayModeLabel.c_str(), false);
+        const std::string displayModeConfSuffix = hdmiOutputActive ? ".display_mode_hdmi" : ".display_mode";
 
-        std::string selectedDisplayMode = SystemConf::getInstance()->get(configName + ".display_mode");
-        for (auto it = availableDisplayModes.begin(); it != availableDisplayModes.end(); it++)
-        {
-            if (selectedDisplayMode.empty())
-            {
-                selectedDisplayMode = "default";
-                continue;
-            }
-
-            // Remove resolution at start, and any trailing markers, e.g. "preferred" or  "current"
-            (*it) = (*it).substr((*it).find("px, ") + 4);
-            (*it) = (*it).substr(0, (*it).find(" Hz") + 3);
-        }
+        std::string selectedDisplayMode = SystemConf::getInstance()->get(configName + displayModeConfSuffix);
+        for (auto it = availableDisplayModes.begin(); it != availableDisplayModes.end(); ++it)
+            *it = normalizeWlrRandrModeLine(*it, displayModeIncludeResolution);
+        availableDisplayModes = dedupeDisplayModesPreserveOrder(std::move(availableDisplayModes));
+        if (selectedDisplayMode.empty())
+            selectedDisplayMode = "default";
         availableDisplayModes.insert(availableDisplayModes.begin(), "default");
 
         cfound = false;
@@ -3064,12 +3195,12 @@ void GuiMenu::openSystemOptionsConfiguration(Window* mWindow, std::string config
         if (!cfound)
             optionsDisplayModes->add(selectedDisplayMode, selectedDisplayMode, true);
 
-        guiSystemOptions->addWithLabel(_("DISPLAY MODE"), optionsDisplayModes);
-        guiSystemOptions->addSaveFunc([configName, selectedDisplayMode, optionsDisplayModes]
+        guiSystemOptions->addWithLabel(displayModeLabel, optionsDisplayModes);
+        guiSystemOptions->addSaveFunc([configName, selectedDisplayMode, optionsDisplayModes, displayModeConfSuffix]
         {
             if (optionsDisplayModes->changed())
             {
-                SystemConf::getInstance()->set(configName + ".display_mode", optionsDisplayModes->getSelected());
+                SystemConf::getInstance()->set(configName + displayModeConfSuffix, optionsDisplayModes->getSelected());
                 SystemConf::getInstance()->saveSystemConf();
             }
         });

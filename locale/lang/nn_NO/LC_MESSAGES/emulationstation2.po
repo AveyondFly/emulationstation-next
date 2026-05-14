@@ -4178,3 +4178,10 @@ msgstr ""
 
 #~ msgid "UPDATE FAILED, THE SYSTEM WILL NOW REBOOT"
 #~ msgstr "OPPDATERING FEILET, SYSTEMET VIL STARTES PÅ NYTT"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

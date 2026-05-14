@@ -4159,6 +4159,12 @@ msgstr ""
 msgid "HUE"
 msgstr ""
 
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+
 msgid "DISPLAY MODE"
 msgstr ""
 

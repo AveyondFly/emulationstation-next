@@ -3966,3 +3966,10 @@ msgstr "JA, OPMAKEN & SAMENVOEGEN"
 
 msgid "NO, IGNORE"
 msgstr "NEE, NEGEER"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

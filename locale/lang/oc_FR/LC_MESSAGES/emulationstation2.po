@@ -4126,3 +4126,10 @@ msgstr ""
 
 #~ msgid "UNINSTALL BEZELS"
 #~ msgstr "DESINSTALLAR BEZELS"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

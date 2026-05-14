@@ -3979,3 +3979,10 @@ msgstr ""
 
 #~ msgid "HAS MEDIAS"
 #~ msgstr "TIENE MEDIOS"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

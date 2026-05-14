@@ -3993,3 +3993,10 @@ msgstr "NÃO, IGNORAR"
 
 #~ msgid "RESTRICT HOTKEYS TO EXIT"
 #~ msgstr "RESTRINGIR ATALHOS PARA SAIR"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

@@ -3946,3 +3946,10 @@ msgstr ""
 
 #~ msgid "SWITCH A & B BUTTONS IN EMULATIONSTATION"
 #~ msgstr "VAIHDA A JA B NÄPPÄIMIÄ EMULATIONSTATIONISSA"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

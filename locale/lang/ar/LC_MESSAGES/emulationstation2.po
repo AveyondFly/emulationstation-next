@@ -4009,3 +4009,10 @@ msgstr ""
 
 #~ msgid "RESTRICT HOTKEYS TO EXIT"
 #~ msgstr "تقييد زر الاختصار للخروج"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

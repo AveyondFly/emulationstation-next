@@ -3980,3 +3980,10 @@ msgstr ""
 
 #~ msgid "model"
 #~ msgstr "Model"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

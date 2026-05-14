@@ -279,7 +279,7 @@ public:
 	std::vector<std::string> getAvailableGpuGovernors();
 
     /* Display Info */
-    std::vector<std::string> getAvailableDisplayModes();
+    std::vector<std::string> getAvailableDisplayModes(const std::string& wlrOutputName = "");
 
     /* LED Colors */
     std::vector<std::string> getAvailableColors();

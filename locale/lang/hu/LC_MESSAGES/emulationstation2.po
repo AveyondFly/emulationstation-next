@@ -4049,3 +4049,10 @@ msgstr "NEM, FIGYELMEN KÍVÜL HAGY"
 
 #~ msgid "HAS MEDIAS"
 #~ msgstr "RENDELKEZIK MÉDIÁVAL"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

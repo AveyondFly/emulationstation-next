@@ -3946,3 +3946,10 @@ msgstr ""
 
 #~ msgid "HAS MEDIAS"
 #~ msgstr "含有媒體"
+
+msgid "HDMI DISPLAY MODE"
+msgstr "HDMI 顯示模式"
+
+msgid "PANEL DISPLAY MODE"
+msgstr "面板顯示模式"
+

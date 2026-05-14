@@ -741,21 +741,113 @@ std::vector<std::string> ApiSystem::getAvailableGpuGovernors()
 	return executeEnumerationScript("/usr/bin/sh -lc \". /etc/profile.d/099-freqfunctions; get_available_gpu_governors\"");
 }
 
-std::vector<std::string> ApiSystem::getAvailableDisplayModes()
+namespace
 {
-    // Check if wlr-randr is available
-    if (!Utils::FileSystem::exists("/usr/bin/wlr-randr")) {
-        LOG(LogWarning) << "wlr-randr not found, display mode configuration unavailable";
-        return {};
-    }
+	bool isWlrRandrOutputNameLine(const std::string& line)
+	{
+		if (line.empty() || line[0] == ' ' || line[0] == '\t')
+			return false;
+		const size_t sp = line.find_first_of(" \t");
+		if (sp == std::string::npos || sp == 0)
+			return false;
+		const std::string tok = line.substr(0, sp);
+		for (char c : tok)
+		{
+			if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.'))
+				return false;
+		}
+		return true;
+	}
 
-    auto result = executeEnumerationScript("/usr/bin/sh -lc \"/usr/bin/wlr-randr | awk '/Modes/{flag=1;next}/Position/{flag=0}flag'\"");
+	bool isWlrRandrModeLine(const std::string& line)
+	{
+		return line.find(" px, ") != std::string::npos && line.find(" Hz") != std::string::npos;
+	}
 
-    if (result.empty()) {
-        LOG(LogWarning) << "No display modes found from wlr-randr";
-    }
+	std::vector<std::string> parseAllWlrRandrModeLines(const std::vector<std::string>& lines)
+	{
+		std::vector<std::string> res;
+		bool inModes = false;
+		for (const std::string& line : lines)
+		{
+			if (isWlrRandrOutputNameLine(line))
+			{
+				inModes = false;
+				continue;
+			}
+			if (line.find("Modes:") != std::string::npos)
+			{
+				inModes = true;
+				continue;
+			}
+			if (inModes && isWlrRandrModeLine(line))
+				res.push_back(line);
+		}
+		return res;
+	}
 
-    return result;
+	std::vector<std::string> parseWlrRandrModeLinesForOutput(const std::vector<std::string>& lines, const std::string& outputName)
+	{
+		std::vector<std::string> res;
+		bool inOutput = false;
+		bool inModes = false;
+		for (const std::string& line : lines)
+		{
+			if (isWlrRandrOutputNameLine(line))
+			{
+				const size_t sp = line.find_first_of(" \t");
+				const std::string name = line.substr(0, sp);
+				inOutput = (name == outputName);
+				inModes = false;
+				continue;
+			}
+			if (!inOutput)
+				continue;
+			if (line.find("Modes:") != std::string::npos)
+			{
+				inModes = true;
+				continue;
+			}
+			if (inModes && isWlrRandrModeLine(line))
+				res.push_back(line);
+		}
+		return res;
+	}
+} // namespace
+
+std::vector<std::string> ApiSystem::getAvailableDisplayModes(const std::string& wlrOutputName)
+{
+	if (!Utils::FileSystem::exists("/usr/bin/wlr-randr")) {
+		LOG(LogWarning) << "wlr-randr not found, display mode configuration unavailable";
+		return {};
+	}
+
+	std::string output = wlrOutputName;
+#if !WIN32
+	if (output.empty())
+		output = Utils::Platform::getActiveWaylandDrmConnectorName();
+#endif
+
+	const std::vector<std::string> raw = executeEnumerationScript("/usr/bin/wlr-randr");
+	if (raw.empty()) {
+		LOG(LogWarning) << "No output from wlr-randr";
+		return {};
+	}
+
+	std::vector<std::string> modeLines;
+	if (output.empty())
+		modeLines = parseAllWlrRandrModeLines(raw);
+	else
+	{
+		modeLines = parseWlrRandrModeLinesForOutput(raw, output);
+		if (modeLines.empty())
+			modeLines = parseAllWlrRandrModeLines(raw);
+	}
+
+	if (modeLines.empty())
+		LOG(LogWarning) << "No display modes found from wlr-randr";
+
+	return modeLines;
 }
 
 std::vector<std::string> ApiSystem::getAvailableColors()

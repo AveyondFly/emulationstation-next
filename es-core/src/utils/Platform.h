@@ -74,6 +74,9 @@ namespace Utils
 		int runSystemCommand(const std::string& cmd_utf8, const std::string& name, Window* window); // run a utf-8 encoded in the shell (requires wstring conversion on Windows)
 		std::string GetEnv(const std::string& var);
 		std::string GetShOutput(const std::string& mStr);
+
+		/** WL/Wayland output name matching wlr-randr (e.g. DSI-1, HDMI-A-1), from DRM sysfs. Empty if unknown. */
+		std::string getActiveWaylandDrmConnectorName();
 	}
 }
 

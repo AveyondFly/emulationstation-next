@@ -4402,3 +4402,10 @@ msgstr ""
 
 #~ msgid "JUMP ON B"
 #~ msgstr "TLAČÍTKO B = NAHORU"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+

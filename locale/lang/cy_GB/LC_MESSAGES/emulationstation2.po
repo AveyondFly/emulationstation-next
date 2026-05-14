@@ -4467,3 +4467,10 @@ msgstr ""
 
 #~ msgid "AN ERROR HAS OCCURED"
 #~ msgstr "MAE GWALL WEDI DIGWYDD"
+
+msgid "HDMI DISPLAY MODE"
+msgstr ""
+
+msgid "PANEL DISPLAY MODE"
+msgstr ""
+
