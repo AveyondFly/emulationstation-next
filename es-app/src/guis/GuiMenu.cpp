@@ -200,7 +200,7 @@ namespace
 		if (waylandOutput.empty())
 			return;
 
-		std::string inner = ". /storage/env.txt 2>/dev/null; ";
+		std::string inner;
 
 		const size_t atPos = selection.find(" @ ");
 		if (atPos != std::string::npos)
