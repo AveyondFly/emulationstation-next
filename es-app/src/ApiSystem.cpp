@@ -162,8 +162,7 @@ std::string ApiSystem::getVersion(bool extra)
 	std::string version = Utils::Platform::GetEnv("OS_VERSION");
 	if (extra)
 	{
-		std::string build = Utils::Platform::GetEnv("OS_BUILD");
-		return build;
+		return "aurknix";
 	}
 	else
 		return version;
@@ -171,7 +170,7 @@ std::string ApiSystem::getVersion(bool extra)
 
 std::string ApiSystem::getApplicationName()
 {
-	return "ROCKNIX";
+	return "AURKNIX";
 }
 
 bool ApiSystem::setOverscan(bool enable) 

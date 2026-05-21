@@ -21,7 +21,7 @@
 #elif RETROBAT
 #define SCREENSCRAPER_SOFTNAME			"Retrobat-Emulationstation"
 #elif ROCKNIX
-#define SCREENSCRAPER_SOFTNAME			"ROCKNIX-Emulationstation"
+#define SCREENSCRAPER_SOFTNAME			"AURKNIX-Emulationstation"
 #else
 #define SCREENSCRAPER_SOFTNAME			"Emulationstation"
 #endif
