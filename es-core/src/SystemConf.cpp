@@ -29,6 +29,18 @@ static std::set<std::string> dontRemoveValue
 	{ "updates.branch" }
 };
 
+static bool shouldPersistConfigValue(const std::string& key, const std::string& value)
+{
+	if (value.empty() || value == "default")
+		return false;
+
+	// Decoration set AUTO must be written explicitly for launcher scripts (e.g. global.bezel=auto).
+	if (value == "auto")
+		return Utils::String::endsWith(key, ".bezel");
+
+	return true;
+}
+
 static std::map<std::string, std::string> defaults =
 {
 	{ "kodi.enabled", "1" },
@@ -163,7 +175,7 @@ bool SystemConf::saveSystemConf()
 			if (idx == 0 || (idx == 1 && (fc == ';' || fc == '#')))
 			{
 				std::string val = confMap[it];
-				if ((!val.empty() && val != "auto" && val != "default") || dontRemoveValue.find(it) != dontRemoveValue.cend())
+				if (shouldPersistConfigValue(it, val) || dontRemoveValue.find(it) != dontRemoveValue.cend())
 				{
 					auto defaultValue = defaults.find(key);
 					if (defaultValue != defaults.cend() && defaultValue->second == val)
@@ -181,7 +193,7 @@ bool SystemConf::saveSystemConf()
 		if (!lineFound)
 		{
 			std::string val = confMap[it];
-			if (!val.empty() && val != "auto")
+			if (shouldPersistConfigValue(it, val))
 				fileLines.push_back(key + val);
 		}
 	}

@@ -3236,7 +3236,7 @@ void GuiMenu::addDecorationSetOptionListComponent(Window* window, GuiSettings* p
 	std::string bezel = SystemConf::getInstance()->get(configName + ".bezel");
 
 	for (auto item : items)
-		decorations->add(item, item, (bezel == item) || (bezel == "none" && item == _("NONE")) || (bezel == "" && item == _("AUTO")));
+		decorations->add(item, item, (bezel == item) || (bezel == "none" && item == _("NONE")) || ((bezel == "" || bezel == "auto") && item == _("AUTO")));
 
 	if (!decorations->hasSelection())
 		decorations->selectFirstItem();
@@ -3244,7 +3244,7 @@ void GuiMenu::addDecorationSetOptionListComponent(Window* window, GuiSettings* p
 	parentWindow->addWithLabel(_("DECORATION SET"), decorations);
 	parentWindow->addSaveFunc([decorations, configName]
 	{
-		SystemConf::getInstance()->set(configName + ".bezel", decorations->getSelected() == _("NONE") ? "none" : decorations->getSelected() == _("AUTO") ? "" : decorations->getSelected());
+		SystemConf::getInstance()->set(configName + ".bezel", decorations->getSelected() == _("NONE") ? "none" : decorations->getSelected() == _("AUTO") ? "auto" : decorations->getSelected());
 	});
 }
 
