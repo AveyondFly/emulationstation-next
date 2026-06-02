@@ -166,7 +166,7 @@ void GuiUpdate::update(int deltaTime)
 			if (!mUpdateVersion.empty()) 
 			{
 				std::string versionExtra = ApiSystem::getInstance()->getVersion(true);
-				if (versionExtra == "official" || versionExtra == "nightly")
+				if (versionExtra == "official" || versionExtra == "nightly" || versionExtra == "aurknix")
 					message = Utils::String::format(_("YOU ARE CURRENTLY USING VERSION %s\nDO YOU WANT TO UPDATE TO VERSION %s?").c_str(), ApiSystem::getInstance()->getVersion().c_str(), mUpdateVersion.c_str());
 				else
 					message = Utils::String::format(_("UNOFFICIAL SYSTEM MODIFICATIONS DETECTED.\nUPGRADING COULD BREAK YOUR SYSTEM.\nDO YOU WANT TO UPDATE TO VERSION %s?").c_str(), mUpdateVersion.c_str());

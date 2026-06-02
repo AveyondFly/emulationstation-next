@@ -4,11 +4,37 @@
 #include "utils/FileSystemUtil.h"
 #include "Log.h"
 #include "Settings.h"
+#include "SystemConf.h"
 #include <pugixml/src/pugixml.hpp>
 #include "utils/StringUtil.h"
 #include <string.h>
 
 MameNames* MameNames::sInstance = nullptr;
+
+namespace {
+
+bool useChineseArcadeRomNames()
+{
+	const std::string lang = SystemConf::getInstance()->get("system.language");
+	if (lang.size() < 2)
+		return false;
+	const unsigned char a = (unsigned char)lang[0];
+	const unsigned char b = (unsigned char)lang[1];
+	return (a == 'z' || a == 'Z') && (b == 'h' || b == 'H');
+}
+
+std::string getArcadeRomsXmlPath()
+{
+	if (useChineseArcadeRomNames())
+	{
+		const std::string chsPath = ResourceManager::getInstance()->getResourcePath(":/arcaderoms_chs.xml");
+		if (Utils::FileSystem::exists(chsPath))
+			return chsPath;
+	}
+	return ResourceManager::getInstance()->getResourcePath(":/arcaderoms.xml");
+}
+
+} // namespace
 
 void MameNames::init()
 {
@@ -59,7 +85,7 @@ MameNames::MameNames()
 	pugi::xml_parse_result result;
 
 	// Read mame games information
-	xmlpath = ResourceManager::getInstance()->getResourcePath(":/arcaderoms.xml");
+	xmlpath = getArcadeRomsXmlPath();
 	if (Utils::FileSystem::exists(xmlpath))
 	{		
 		result = doc.load_file(WINSTRINGW(xmlpath).c_str());
