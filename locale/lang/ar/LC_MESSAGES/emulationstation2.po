@@ -3134,6 +3134,9 @@ msgstr "سلوك شاشة التوقف"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "إيقاف الموسيقى في أثناء بدئ شاشة التوقف"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "إطفاء الإضاءة الخلفية"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "إعدادات شاشة توقف الفيديو العشوائي"
 

@@ -3106,6 +3106,9 @@ msgstr "화면 보호기 유형"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "화면 보호기 실행시 음악 중지"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "백라이트 끄기"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "무작위 비디오 화면 보호기 설정"
 

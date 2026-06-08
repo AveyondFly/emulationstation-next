@@ -3072,6 +3072,9 @@ msgstr "סוג שומר המסך"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "הפסקת מוזיקה בשומר מסך"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "כיבוי תאורה אחורית"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "הגדרות סרטון אקראי בשומר מסך"
 

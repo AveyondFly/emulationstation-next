@@ -71,6 +71,23 @@ GuiGeneralScreensaverOptions::GuiGeneralScreensaverOptions(Window* window, int s
 		addSaveFunc([ctlStopMusic] { Settings::getInstance()->setBool("StopMusicOnScreenSaver", ctlStopMusic->getState()); });
 	}
 
+#if !WIN32
+	if (ssBehavior == "black")
+	{
+		std::vector<BrightnessDevice> brightnesses;
+		if (ApiSystem::getInstance()->getBrightness(brightnesses))
+		{
+			auto ctlBacklight = std::make_shared<SwitchComponent>(mWindow);
+			ctlBacklight->setState(Settings::getInstance()->getBool("ScreenSaverTurnOffBacklight"));
+			addWithLabel(_("TURN OFF BACKLIGHT"), ctlBacklight);
+			addSaveFunc([ctlBacklight]
+			{
+				Settings::getInstance()->setBool("ScreenSaverTurnOffBacklight", ctlBacklight->getState());
+			});
+		}
+	}
+#endif
+
 	if (ssBehavior == "random video")
 		addVideoScreensaverOptions(selectItem);
 	else if (ssBehavior == "slideshow")

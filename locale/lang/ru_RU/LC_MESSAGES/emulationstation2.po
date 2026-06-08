@@ -3114,6 +3114,9 @@ msgstr "ПОВЕДЕНИЕ ЗАСТАВКИ"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "ОТКЛЮЧИТЬ МУЗЫКУ В ЗАСТАВКЕ"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "ВЫКЛЮЧИТЬ ПОДСВЕТКУ"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "НАСТРОЙКИ ВИДЕО ЗАСТАВКИ"
 

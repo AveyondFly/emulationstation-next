@@ -3097,6 +3097,9 @@ msgstr "ΣΥΜΠΕΡΙΦΟΡΑ ΠΡΟΦΥΛΑΞΗΣ ΟΘΟΝΗΣ"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "ΔΙΑΚΟΠΗ ΜΟΥΣΙΚΗΣ ΣΤΗΝ ΠΡΟΦΥΛΑΞΗ ΟΘΟΝΗΣ"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ ΟΠΙΣΘΙΟΦΩΤΙΣΜΟΥ"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "ΤΥΧΑΙΕΣ ΡΥΘΜΙΣΕΙΣ ΒΙΝΤΕΟ ΠΡΟΦΥΛΑΞΗΣ ΟΘΟΝΗΣ"
 

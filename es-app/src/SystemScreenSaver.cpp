@@ -29,6 +29,22 @@
 #define FADE_TIME					(500)
 #define DATE_TIME_UPDATE_INTERVAL	(100)
 
+static void updateScreenSaverBacklight(bool screenSaverActive)
+{
+#if !WIN32
+	if (Settings::getInstance()->getString("ScreenSaverBehavior") != "black")
+		return;
+
+	if (!Settings::getInstance()->getBool("ScreenSaverTurnOffBacklight"))
+		return;
+
+	if (screenSaverActive)
+		ApiSystem::getInstance()->setBacklightOffForScreenSaver();
+	else
+		ApiSystem::getInstance()->restoreBacklightFromScreenSaver();
+#endif
+}
+
 SystemScreenSaver::SystemScreenSaver(Window* window) :
 	mVideoScreensaver(NULL),
 	mImageScreensaver(NULL),
@@ -200,6 +216,7 @@ void SystemScreenSaver::startScreenSaver()
 	// No videos. Just use a standard screensaver
 	mState = STATE_SCREENSAVER_ACTIVE;
 	mCurrentGame = NULL;
+	updateScreenSaverBacklight(true);
 }
 
 void SystemScreenSaver::stopScreenSaver()
@@ -221,6 +238,9 @@ void SystemScreenSaver::stopScreenSaver()
 	if(isExitingScreenSaver && mState != STATE_INACTIVE) {
 	  Scripting::fireEvent("screensaver-stop");
 	}
+
+	if (isExitingScreenSaver)
+		updateScreenSaverBacklight(false);
 
 	// we need this to loop through different videos
 	mState = STATE_INACTIVE;

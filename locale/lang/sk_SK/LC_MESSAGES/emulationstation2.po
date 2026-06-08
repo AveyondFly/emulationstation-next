@@ -3118,6 +3118,9 @@ msgstr "Typ šetriča obrazovky"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "Zastaviť hudbu pri šetriči obrazovky"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "VYPNÚŤ PODSVIETENIE"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "Náhodné nastavenia video šetriča obrazovky"
 

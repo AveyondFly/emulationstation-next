@@ -3076,6 +3076,9 @@ msgstr ""
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr ""
 
+msgid "TURN OFF BACKLIGHT"
+msgstr ""
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr ""
 

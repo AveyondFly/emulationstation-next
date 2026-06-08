@@ -252,6 +252,7 @@ void Settings::setDefaults()
 	mStringMap["PowerSaverMode"] = "default"; 
 
 	mBoolMap["StopMusicOnScreenSaver"] = false;
+	mBoolMap["ScreenSaverTurnOffBacklight"] = false;
 
 	mBoolMap["RetroachievementsMenuitem"] = true;
 	mIntMap["ScreenSaverSwapImageTimeout"] = 10000;

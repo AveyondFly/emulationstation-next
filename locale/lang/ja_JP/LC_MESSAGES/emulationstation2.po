@@ -3120,6 +3120,9 @@ msgstr "スクリーンセーバー種類"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "スクリーンセーバー実行時音楽を停止"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "バックライトをオフ"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "映像スクリーンセーバー設定"
 

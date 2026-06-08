@@ -3102,6 +3102,9 @@ msgstr "螢幕保護程式行為"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "在螢幕保護程式中停止音樂"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "關閉背光"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "隨機影片螢幕保護程式設定"
 

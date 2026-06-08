@@ -3123,6 +3123,9 @@ msgstr "LOẠI BẢO VỆ MÀN HÌNH"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "DỪNG NHẠC TRÊN BẢO VỆ MÀN HÌNH"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "TẮT ĐÈN NỀN"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "CÀI ĐẶT VIDEO BẢO VỆ MÀN HÌNH NGẪU NHIÊN"
 

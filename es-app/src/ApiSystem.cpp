@@ -1500,6 +1500,43 @@ void ApiSystem::setBrightness(BrightnessDevice bd)
 	Utils::FileSystem::writeAllText(bd.path, content);
 }
 
+static std::vector<BrightnessDevice> sScreenSaverSavedBacklight;
+static bool sScreenSaverBacklightSaved = false;
+
+void ApiSystem::setBacklightOffForScreenSaver()
+{
+#if WIN32
+	return;
+#endif
+	if (sScreenSaverBacklightSaved)
+		return;
+
+	std::vector<BrightnessDevice> values;
+	if (!getBrightness(values))
+		return;
+
+	sScreenSaverSavedBacklight = values;
+	sScreenSaverBacklightSaved = true;
+
+	for (const auto& device : values)
+		Utils::FileSystem::writeAllText(device.path, "0\n");
+}
+
+void ApiSystem::restoreBacklightFromScreenSaver()
+{
+#if WIN32
+	return;
+#endif
+	if (!sScreenSaverBacklightSaved)
+		return;
+
+	for (const auto& device : sScreenSaverSavedBacklight)
+		setBrightness(device);
+
+	sScreenSaverSavedBacklight.clear();
+	sScreenSaverBacklightSaved = false;
+}
+
 static std::string LED_COLOUR_NAME;
 static std::string LED_BRIGHTNESS_VALUE;
 static std::string LED_MAX_BRIGHTNESS_VALUE;

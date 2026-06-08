@@ -3287,6 +3287,9 @@ msgstr "屏保样式"
 msgid "STOP MUSIC ON SCREENSAVER"
 msgstr "屏保启动时停止音乐"
 
+msgid "TURN OFF BACKLIGHT"
+msgstr "关闭背光"
+
 msgid "RANDOM VIDEO SCREENSAVER SETTINGS"
 msgstr "屏保-随机视频设置"
 

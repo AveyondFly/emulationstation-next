@@ -335,6 +335,8 @@ public:
 
 	bool	getBrightness(std::vector<BrightnessDevice>& value);
 	void	setBrightness(BrightnessDevice value);
+	void	setBacklightOffForScreenSaver();
+	void	restoreBacklightFromScreenSaver();
 
 	// LED RGB sliders
 	bool getLED(int& red, int& green, int& blue);
