@@ -3914,6 +3914,21 @@ msgstr ""
 msgid "NO, IGNORE"
 msgstr ""
 
+msgid "APPLY"
+msgstr "套用"
+
+msgid "DATE & TIME"
+msgstr "日期與時間"
+
+msgid "MANUAL DATE & TIME"
+msgstr "手動設定日期與時間"
+
+msgid "SYSTEM TIME UPDATED"
+msgstr "系統時間已更新"
+
+msgid "SYSTEM TIME UPDATE FAILED"
+msgstr "系統時間更新失敗"
+
 #~ msgid "BY HARDWARE TYPE"
 #~ msgstr "依硬體類型"
 

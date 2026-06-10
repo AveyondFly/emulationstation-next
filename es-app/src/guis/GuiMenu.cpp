@@ -34,6 +34,7 @@
 #include "utils/Platform.h"
 #include "utils/FileSystemUtil.h"
 #include "utils/StringUtil.h"
+#include "utils/TimeUtil.h"
 
 
 #include "SystemConf.h"
@@ -66,6 +67,9 @@
 #include "TextToSpeech.h"
 #include "Paths.h"
 #include <set> 
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #if !WIN32
 #include <vector>
@@ -228,6 +232,370 @@ namespace
 
 		Utils::Platform::runSystemCommand("/usr/bin/sh -lc " + shellSingleQuoteForSh(inner), "", nullptr);
 	}
+
+	static std::string formatNumberForDateTime(int value, bool twoDigits)
+	{
+		char buffer[16];
+		if (twoDigits)
+			std::snprintf(buffer, sizeof(buffer), "%02d", value);
+		else
+			std::snprintf(buffer, sizeof(buffer), "%d", value);
+		return buffer;
+	}
+
+	static std::string buildDateTimeCommandValue(int year, int month, int day, int hour, int minute, int second)
+	{
+		char buffer[32];
+		std::snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+		return buffer;
+	}
+
+	class DateTimeSetterComponent : public GuiComponent
+	{
+	public:
+		DateTimeSetterComponent(Window* window, const std::tm& initialTime, int minYear, int maxYear)
+			: GuiComponent(window),
+			  mTime(initialTime),
+			  mMinYear(minYear),
+			  mMaxYear(maxYear),
+			  mSelectedField(0)
+		{
+			auto theme = ThemeData::getMenuTheme();
+			mFont = theme->Text.font;
+			mColor = theme->Text.color;
+			mSelectedColor = theme->Text.selectedColor;
+			mSelectorColor = theme->Text.selectorColor;
+
+			const std::vector<std::string> initialParts = { "0000", "-", "00", "-", "00", " ", "00", ":", "00", ":", "00" };
+			for (const std::string& part : initialParts)
+			{
+				auto text = std::make_shared<TextComponent>(mWindow, part, mFont, mColor, ALIGN_CENTER);
+				text->setVerticalAlignment(ALIGN_CENTER);
+				mParts.push_back(text);
+				addChild(text.get());
+			}
+
+			clampDate();
+			updateText();
+		}
+
+		bool input(InputConfig* config, Input input) override
+		{
+			if (input.value == 0)
+				return false;
+
+			if (config->isMappedLike("left", input))
+			{
+				mSelectedField = (mSelectedField + FIELD_COUNT - 1) % FIELD_COUNT;
+				updateText();
+				return true;
+			}
+
+			if (config->isMappedLike("right", input))
+			{
+				mSelectedField = (mSelectedField + 1) % FIELD_COUNT;
+				updateText();
+				return true;
+			}
+
+			if (config->isMappedTo(BUTTON_OK, input))
+			{
+				if (mApplyCallback)
+					mApplyCallback();
+				return true;
+			}
+
+			if (config->isMappedLike("up", input))
+			{
+				adjustSelectedField(1);
+				return true;
+			}
+
+			if (config->isMappedLike("down", input))
+			{
+				adjustSelectedField(-1);
+				return true;
+			}
+
+			return GuiComponent::input(config, input);
+		}
+
+		std::vector<HelpPrompt> getHelpPrompts() override
+		{
+			return {
+				HelpPrompt("left/right", _("SELECT")),
+				HelpPrompt("up/down", _("CHANGE")),
+				HelpPrompt(BUTTON_OK, _("APPLY"))
+			};
+		}
+
+		void setApplyCallback(const std::function<void()>& callback)
+		{
+			mApplyCallback = callback;
+		}
+
+		std::string getCommandValue() const
+		{
+			return buildDateTimeCommandValue(
+				mTime.tm_year + 1900,
+				mTime.tm_mon + 1,
+				mTime.tm_mday,
+				mTime.tm_hour,
+				mTime.tm_min,
+				mTime.tm_sec);
+		}
+
+	private:
+		enum Field
+		{
+			FIELD_YEAR = 0,
+			FIELD_MONTH,
+			FIELD_DAY,
+			FIELD_HOUR,
+			FIELD_MINUTE,
+			FIELD_SECOND,
+			FIELD_COUNT
+		};
+
+		static int fieldToPartIndex(int field)
+		{
+			static const int fieldPartIndexes[FIELD_COUNT] = { 0, 2, 4, 6, 8, 10 };
+			return fieldPartIndexes[field];
+		}
+
+		void clampDate()
+		{
+			if (mTime.tm_year + 1900 < mMinYear)
+				mTime.tm_year = mMinYear - 1900;
+			else if (mTime.tm_year + 1900 > mMaxYear)
+				mTime.tm_year = mMaxYear - 1900;
+
+			if (mTime.tm_mon < 0)
+				mTime.tm_mon = 0;
+			else if (mTime.tm_mon > 11)
+				mTime.tm_mon = 11;
+
+			const int daysInMonth = Utils::Time::daysInMonth(mTime.tm_year + 1900, mTime.tm_mon + 1);
+			if (mTime.tm_mday < 1)
+				mTime.tm_mday = 1;
+			else if (mTime.tm_mday > daysInMonth)
+				mTime.tm_mday = daysInMonth;
+
+			if (mTime.tm_hour < 0)
+				mTime.tm_hour = 0;
+			else if (mTime.tm_hour > 23)
+				mTime.tm_hour = 23;
+
+			if (mTime.tm_min < 0)
+				mTime.tm_min = 0;
+			else if (mTime.tm_min > 59)
+				mTime.tm_min = 59;
+
+			if (mTime.tm_sec < 0)
+				mTime.tm_sec = 0;
+			else if (mTime.tm_sec > 59)
+				mTime.tm_sec = 59;
+		}
+
+		void adjustSelectedField(int direction)
+		{
+			switch (mSelectedField)
+			{
+			case FIELD_YEAR:
+			{
+				int year = mTime.tm_year + 1900 + direction;
+				if (year > mMaxYear)
+					year = mMinYear;
+				else if (year < mMinYear)
+					year = mMaxYear;
+				mTime.tm_year = year - 1900;
+				break;
+			}
+			case FIELD_MONTH:
+				mTime.tm_mon += direction;
+				if (mTime.tm_mon > 11)
+					mTime.tm_mon = 0;
+				else if (mTime.tm_mon < 0)
+					mTime.tm_mon = 11;
+				break;
+			case FIELD_DAY:
+			{
+				const int daysInMonth = Utils::Time::daysInMonth(mTime.tm_year + 1900, mTime.tm_mon + 1);
+				mTime.tm_mday += direction;
+				if (mTime.tm_mday > daysInMonth)
+					mTime.tm_mday = 1;
+				else if (mTime.tm_mday < 1)
+					mTime.tm_mday = daysInMonth;
+				break;
+			}
+			case FIELD_HOUR:
+				mTime.tm_hour = (mTime.tm_hour + direction + 24) % 24;
+				break;
+			case FIELD_MINUTE:
+				mTime.tm_min = (mTime.tm_min + direction + 60) % 60;
+				break;
+			case FIELD_SECOND:
+				mTime.tm_sec = (mTime.tm_sec + direction + 60) % 60;
+				break;
+			default:
+				break;
+			}
+
+			clampDate();
+			updateText();
+		}
+
+		void updateText()
+		{
+			mParts[0]->setText(formatNumberForDateTime(mTime.tm_year + 1900, false));
+			mParts[2]->setText(formatNumberForDateTime(mTime.tm_mon + 1, true));
+			mParts[4]->setText(formatNumberForDateTime(mTime.tm_mday, true));
+			mParts[6]->setText(formatNumberForDateTime(mTime.tm_hour, true));
+			mParts[8]->setText(formatNumberForDateTime(mTime.tm_min, true));
+			mParts[10]->setText(formatNumberForDateTime(mTime.tm_sec, true));
+
+			for (size_t i = 0; i < mParts.size(); ++i)
+			{
+				const bool selected = (int)i == fieldToPartIndex(mSelectedField);
+				mParts[i]->setColor(selected ? mSelectedColor : mColor);
+				mParts[i]->setBackgroundColor(selected ? mSelectorColor : 0x00000000);
+				mParts[i]->setRenderBackground(selected);
+			}
+
+			layoutParts();
+		}
+
+		void layoutParts()
+		{
+			float x = 0.0f;
+			const float height = mFont->getHeight() * 1.45f;
+			const float fieldPadding = mFont->sizeText(" ").x();
+
+			for (size_t i = 0; i < mParts.size(); ++i)
+			{
+				const bool field = (i == 0 || i == 2 || i == 4 || i == 6 || i == 8 || i == 10);
+				const Vector2f textSize = mFont->sizeText(mParts[i]->getText());
+				const float width = textSize.x() + (field ? fieldPadding * 2.0f : 0.0f);
+				mParts[i]->setSize(width, height);
+				mParts[i]->setPosition(x, 0.0f);
+				x += width;
+			}
+
+			setSize(x, height);
+		}
+
+		std::tm mTime;
+		int mMinYear;
+		int mMaxYear;
+		int mSelectedField;
+		unsigned int mColor;
+		unsigned int mSelectedColor;
+		unsigned int mSelectorColor;
+		std::shared_ptr<Font> mFont;
+		std::vector<std::shared_ptr<TextComponent>> mParts;
+		std::function<void()> mApplyCallback;
+	};
+
+	class DateTimeSettingsGui : public GuiComponent
+	{
+	public:
+		DateTimeSettingsGui(Window* window, const std::tm& initialTime, int minYear, int maxYear)
+			: GuiComponent(window),
+			  mBackground(window)
+		{
+			auto theme = ThemeData::getMenuTheme();
+
+			mBackground.setImagePath(theme->Background.path);
+			mBackground.setEdgeColor(theme->Background.color);
+			mBackground.setCenterColor(theme->Background.centerColor);
+			mBackground.setCornerSize(theme->Background.cornerSize);
+			mBackground.setPostProcessShader(theme->Background.menuShader);
+			addChild(&mBackground);
+
+			mTitle = std::make_shared<TextComponent>(
+				mWindow,
+				Utils::String::toUpper(_("DATE & TIME")),
+				theme->Title.font,
+				theme->Title.color,
+				ALIGN_CENTER);
+			addChild(mTitle.get());
+
+			mLabel = std::make_shared<TextComponent>(
+				mWindow,
+				Utils::String::toUpper(_("MANUAL DATE & TIME")),
+				theme->Text.font,
+				theme->Text.color,
+				ALIGN_CENTER);
+			addChild(mLabel.get());
+
+			mDateTimeSetter = std::make_shared<DateTimeSetterComponent>(mWindow, initialTime, minYear, maxYear);
+			mDateTimeSetter->setApplyCallback([this]
+			{
+				const std::string dateTime = mDateTimeSetter->getCommandValue();
+				const std::string command = "date -s " + shellSingleQuoteForSh(dateTime) + " && { command -v hwclock >/dev/null 2>&1 && hwclock -w -u || true; }";
+
+				if (std::system(command.c_str()) == 0)
+					mWindow->pushGui(new GuiMsgBox(mWindow, _("SYSTEM TIME UPDATED"), _("OK"), nullptr));
+				else
+					mWindow->pushGui(new GuiMsgBox(mWindow, _("SYSTEM TIME UPDATE FAILED"), _("OK"), nullptr));
+			});
+			addChild(mDateTimeSetter.get());
+
+			setSize((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());
+			onSizeChanged();
+		}
+
+		bool input(InputConfig* config, Input input) override
+		{
+			if (input.value != 0 && config->isMappedTo(BUTTON_BACK, input))
+			{
+				delete this;
+				return true;
+			}
+
+			if (mDateTimeSetter->input(config, input))
+				return true;
+
+			return GuiComponent::input(config, input);
+		}
+
+		void onSizeChanged() override
+		{
+			const float screenWidth = (float)Renderer::getScreenWidth();
+			const float screenHeight = (float)Renderer::getScreenHeight();
+			const float panelWidth = (float)Math::min((int)screenHeight, (int)(screenWidth * 0.90f));
+			const float padding = screenHeight * 0.04f;
+			const float titleHeight = mTitle->getFont()->getHeight() + padding;
+			const float labelHeight = mLabel->getFont()->getHeight() + padding * 0.5f;
+			const float setterHeight = mDateTimeSetter->getSize().y();
+			const float panelHeight = padding + titleHeight + labelHeight + setterHeight + padding;
+			const float panelX = (screenWidth - panelWidth) / 2.0f;
+			const float panelY = (screenHeight - panelHeight) / 2.0f;
+
+			mBackground.fitTo(Vector2f(panelWidth, panelHeight), Vector3f(panelX, panelY, 0.0f), Vector2f(-32.0f, -32.0f));
+
+			mTitle->setSize(panelWidth - padding * 2.0f, mTitle->getFont()->getHeight());
+			mTitle->setPosition(panelX + padding, panelY + padding);
+
+			mLabel->setSize(panelWidth - padding * 2.0f, mLabel->getFont()->getHeight());
+			mLabel->setPosition(panelX + padding, panelY + padding + titleHeight);
+
+			mDateTimeSetter->setPosition(
+				panelX + (panelWidth - mDateTimeSetter->getSize().x()) / 2.0f,
+				panelY + padding + titleHeight + labelHeight);
+		}
+
+		std::vector<HelpPrompt> getHelpPrompts() override
+		{
+			return mDateTimeSetter->getHelpPrompts();
+		}
+
+	private:
+		NinePatchComponent mBackground;
+		std::shared_ptr<TextComponent> mTitle;
+		std::shared_ptr<TextComponent> mLabel;
+		std::shared_ptr<DateTimeSetterComponent> mDateTimeSetter;
+	};
 }
 
 GuiMenu::GuiMenu(Window *window, bool animate) : GuiComponent(window), mMenu(window, _("MAIN MENU").c_str())
@@ -1503,6 +1871,26 @@ static std::vector<std::pair<std::string, std::string>> getScriptOutput(const st
 }
 #endif
 
+void GuiMenu::openDateTimeSettings()
+{
+	Window* window = mWindow;
+
+	std::time_t now = std::time(nullptr);
+	std::tm currentTime = { 0, 0, 12, 1, 0, 126, 0, 0, -1 };
+	if (now > 0)
+	{
+		std::tm* localTime = std::localtime(&now);
+		if (localTime != nullptr)
+			currentTime = *localTime;
+	}
+
+	const int currentYear = currentTime.tm_year + 1900;
+	const int minYear = std::min(2020, currentYear - 5);
+	const int maxYear = std::max(2040, currentYear + 10);
+
+	window->pushGui(new DateTimeSettingsGui(window, currentTime, minYear, maxYear));
+}
+
 void GuiMenu::openSystemSettings() 
 {
 	Window *window = mWindow;
@@ -1712,6 +2100,8 @@ void GuiMenu::openSystemSettings()
 		}
 	}
 #endif
+
+	s->addEntry(_("DATE & TIME"), true, [this] { openDateTimeSettings(); });
 
 	// Clock time format (14:42 or 2:42 pm)
 	s->addSwitch(_("SHOW CLOCK IN 12-HOUR FORMAT"), "ClockMode12", true);

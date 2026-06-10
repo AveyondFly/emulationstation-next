@@ -4472,6 +4472,18 @@ msgstr "屏幕阅读器已启用"
 msgid "SCREEN READER DISABLED"
 msgstr "屏幕阅读器已关闭"
 
+msgid "DATE & TIME"
+msgstr "日期和时间"
+
+msgid "MANUAL DATE & TIME"
+msgstr "手动设置日期和时间"
+
+msgid "SYSTEM TIME UPDATED"
+msgstr "系统时间已更新"
+
+msgid "SYSTEM TIME UPDATE FAILED"
+msgstr "系统时间更新失败"
+
 #~ msgid "Bezel (16:9)"
 #~ msgstr "遮罩（16:9）"
 

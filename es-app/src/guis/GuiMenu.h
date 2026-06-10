@@ -52,6 +52,7 @@ private:
         void openUpdatesSettings();
         
         void openSystemSettings();
+        void openDateTimeSettings();
         void openGamesSettings();       
         void openNetworkSettings(bool selectWifiEnable = false, bool selectAdhocEnable = false);        
         void openQuitMenu();
