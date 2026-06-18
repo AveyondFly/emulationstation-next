@@ -2725,7 +2725,7 @@ void GuiMenu::openSystemSettings()
 		dtbOverlayItem(mWindow, s, "custom");
 	}
 
-#if defined(AMD64) || defined(RK3326) || defined(RK3326S) || defined(RK3566) || defined(RK3562) || defined(RK3588) || defined(RK3399) || defined(SM8250)
+#if defined(AMD64) || defined(RK3326) || defined(RK3326S) || defined(RK3566) || defined(RK356X) || defined(RK3588) || defined(RK3399) || defined(SM8250)
 	// Allow user control over how the device sleeps - only show for devices with real suspend enabled
 	s->addGroup(_("SUSPEND"));
 	auto optionsSleep = std::make_shared<OptionListComponent<std::string> >(mWindow, _("DEVICE SUSPEND MODE"), false);
