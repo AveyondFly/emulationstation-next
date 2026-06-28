@@ -329,6 +329,10 @@ void SystemData::populateFolder(FolderData* folder, std::unordered_map<std::stri
 
 			// Hardcoded optimisation : vpinball 'roms' subfolder must be excluded
 			if (mMetadata.name == "vpinball" && fn == "roms")
+				continue;
+
+			// Hardcoded optimisation : mrp 'mythroad' subfolder must be excluded
+			if (mMetadata.name == "mrp" && fn == "mythroad")
 				continue;			
 
 			// Skip ports folders, as many folders in ports causes slow down at startup
