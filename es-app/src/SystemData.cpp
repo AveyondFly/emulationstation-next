@@ -1356,8 +1356,27 @@ SystemData* SystemData::getPrev() const
 std::string SystemData::getGamelistPath(bool forWrite) const
 {
 	std::string filePath;
+	const std::string rootPath = mRootFolder->getPath();
 
-	filePath = mRootFolder->getPath() + "/gamelist.xml";
+	// Built-in tools gamelist: use localized file for Chinese UI when present
+	if (!forWrite && mMetadata.name == "tools")
+	{
+		std::string language = SystemConf::getInstance()->get("system.language");
+		if (language.empty())
+			language = "en_US";
+
+		const bool isChinese = (language == "zh_CN" || language == "zh_TW" || language == "zh"
+			|| Utils::String::startsWith(language, "zh_"));
+
+		if (isChinese)
+		{
+			const std::string zhPath = rootPath + "/gamelist_zh.xml";
+			if (Utils::FileSystem::exists(zhPath))
+				return zhPath;
+		}
+	}
+
+	filePath = rootPath + "/gamelist.xml";
 	if(Utils::FileSystem::exists(filePath))
 		return filePath;
 
