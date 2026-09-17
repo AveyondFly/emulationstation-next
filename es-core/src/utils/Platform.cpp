@@ -260,6 +260,23 @@ namespace Utils
 				LOG(LogInfo) << "Restarting EmulationStation";
 				touch("/tmp/restart.please");
 				break;
+			case QuitMode::EJECT_EXTERNAL_RESTART:
+				LOG(LogInfo) << "Ejecting external games storage and restarting EmulationStation";
+#if defined(ROCKNIX)
+				if (system("/usr/bin/automount eject-external") != 0)
+					LOG(LogError) << "Unable to eject external games storage";
+#endif
+				touch("/tmp/restart.please");
+				break;
+			case QuitMode::SWITCH_STORAGE_RESTART:
+				LOG(LogInfo) << "Switching games storage and restarting EmulationStation";
+#if defined(ROCKNIX)
+				if (system("/usr/bin/busybox rm -f /run/rocknix-games-hotplug && "
+						   "/usr/bin/systemctl restart rocknix-automount") != 0)
+					LOG(LogError) << "Unable to switch games storage";
+#endif
+				touch("/tmp/restart.please");
+				break;
 			case QuitMode::REBOOT:
 			case QuitMode::FAST_REBOOT:
 				LOG(LogInfo) << "Rebooting system";

@@ -2519,54 +2519,71 @@ void GuiMenu::openSystemSettings()
 
 	if (Utils::Platform::GetEnv("DEVICE_MMC_EJECT") != "false") {
 		s->addGroup(_("STORAGE"));
-		// Provides a mechanism to disable use of the second device
+		// Provides a mechanism to disable automatic games partition mounting.
 		bool MountGamesEnabled = SystemConf::getInstance()->getBool("system.automount");
 		auto mount_games = std::make_shared<SwitchComponent>(mWindow);
 		mount_games->setState(MountGamesEnabled);
 		s->addWithLabel(_("AUTODETECT GAMES CARD"), mount_games);
-		mount_games->setOnChangedCallback([this, s, mount_games] {
+		mount_games->setOnChangedCallback([mount_games] {
 			SystemConf::getInstance()->setBool("system.automount", mount_games->getState());
+			SystemConf::getInstance()->saveSystemConf();
 			Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount", "", nullptr);
 		});
-		if (Utils::FileSystem::exists("/storage/.ms_supported") && MountGamesEnabled)
+
+		if (MountGamesEnabled)
 		{
-			auto overlayState = std::make_shared<SwitchComponent>(mWindow);
-			bool overlayStateEnabled = SystemConf::getInstance()->getBool("system.merged.storage");
-			overlayState->setState(overlayStateEnabled);
-			s->addWithLabel(_("ENABLE MERGED STORAGE"), overlayState);
-			overlayState->setOnChangedCallback([this, s, overlayState] {
-				bool overlayStateEnabled = overlayState->getState();
-				SystemConf::getInstance()->setBool("system.merged.storage", overlayState->getState());
-				Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount", "", nullptr);
-			});
-			auto optionsMSDevice = std::make_shared<OptionListComponent<std::string> >(mWindow, _("MERGED STORAGE PRIMARY CARD"), false);
-			std::string selectedMSDevice = SystemConf::getInstance()->get("system.merged.device");
-			if (selectedMSDevice.empty())
-				selectedMSDevice = "default";
-			optionsMSDevice->add(_("DEFAULT"),"default", selectedMSDevice == "default");
-			optionsMSDevice->add(_("EXTERNAL"),"external", selectedMSDevice == "external");
-			optionsMSDevice->add(_("INTERNAL"),"internal", selectedMSDevice == "internal");
-			s->addWithLabel(_("MERGED STORAGE PRIMARY CARD"), optionsMSDevice);
-			s->addSaveFunc([this, optionsMSDevice, selectedMSDevice]
+			const bool internalAvailable = Utils::Platform::GetShOutput(
+				"/usr/bin/busybox mountpoint -q /storage/games-internal && echo internal") == "internal";
+			const bool externalAvailable = Utils::Platform::GetShOutput(
+				"/usr/bin/busybox mountpoint -q /storage/games-external && echo external") == "external";
+
+			// There is nothing to choose unless both game partitions are present.
+			if (internalAvailable && externalAvailable)
 			{
-				if (optionsMSDevice->changed()) {
-					mWindow->pushGui(new GuiMsgBox(mWindow, _("WARNING: CHANGING THE PRIMARY CARD CAN CAUSE ACCESS TO GAMES TO BE LOST, REQUIRING MANUAL INTERVENTION TO CORRECT. CONTINUE?"), _("YES"), [this, optionsMSDevice, selectedMSDevice]
-					{
-						SystemConf::getInstance()->set("system.merged.device", optionsMSDevice->getSelected());
-						Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount " + optionsMSDevice->getSelected(), "", nullptr);
-					}, _("NO"), nullptr));
-				}
-			});
-		}
-		s->addEntry(_("EJECT MICROSD CARD"), false, [window] {
-			if (Utils::FileSystem::exists("/storage/.ms_supported"))
-			{
-				Utils::Platform::runSystemCommand("/usr/bin/umount -f /storage/roms; /usr/bin/umount -f /storage/games-external", "", nullptr);
-			} else {
-				Utils::Platform::runSystemCommand("/usr/bin/umount -f /storage/roms", "", nullptr);
+				auto gameStorage = std::make_shared<OptionListComponent<std::string>>(mWindow, _("STORAGE DEVICE"), false);
+				std::string selectedStorage = SystemConf::getInstance()->get("system.games.storage");
+				if (selectedStorage != "auto" && selectedStorage != "internal" && selectedStorage != "external")
+					selectedStorage = "auto";
+
+				gameStorage->add(_("AUTO"), "auto", selectedStorage == "auto");
+				gameStorage->add(_("INTERNAL"), "internal", selectedStorage == "internal");
+				gameStorage->add(_("EXTERNAL"), "external", selectedStorage == "external");
+				if (!gameStorage->hasSelection())
+					gameStorage->selectFirstItem();
+
+				s->addWithLabel(_("STORAGE DEVICE"), gameStorage);
+				s->addSaveFunc([window, gameStorage]
+				{
+					if (!gameStorage->changed())
+						return;
+
+					SystemConf::getInstance()->set("system.games.storage", gameStorage->getSelected());
+					SystemConf::getInstance()->saveSystemConf();
+					window->pushGui(new GuiMsgBox(window,
+						_("Game storage will be switched after EmulationStation restarts"),
+						_("Restart now"), [] {
+							Utils::Platform::quitES(Utils::Platform::QuitMode::SWITCH_STORAGE_RESTART);
+						},
+						_("later"), nullptr)
+					);
+				});
 			}
-			window->pushGui(new GuiMsgBox(window, _("You may now remove the card.")));
-		});
+
+			if (externalAvailable)
+			{
+				s->addEntry(_("EJECT MICROSD CARD"), false, [window] {
+					const bool externalWasActive = Utils::Platform::GetShOutput(
+						"cat /run/rocknix-games-storage 2>/dev/null") == "external";
+					if (externalWasActive)
+						Utils::Platform::quitES(Utils::Platform::QuitMode::EJECT_EXTERNAL_RESTART);
+					else
+					{
+						Utils::Platform::runSystemCommand("/usr/bin/automount eject-external", "", nullptr);
+						window->pushGui(new GuiMsgBox(window, _("You may now remove the card.")));
+					}
+				});
+			}
+		}
 	}
 
 	s->addGroup(_("PERFORMANCE"));
