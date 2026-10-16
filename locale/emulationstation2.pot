@@ -1762,6 +1762,12 @@ msgstr ""
 msgid "STORAGE DEVICE"
 msgstr ""
 
+msgid "INTERNAL STORAGE"
+msgstr ""
+
+msgid "EXTERNAL STORAGE"
+msgstr ""
+
 msgid "BACKUP USER DATA"
 msgstr ""
 

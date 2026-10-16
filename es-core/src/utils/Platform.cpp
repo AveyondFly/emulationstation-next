@@ -260,14 +260,6 @@ namespace Utils
 				LOG(LogInfo) << "Restarting EmulationStation";
 				touch("/tmp/restart.please");
 				break;
-			case QuitMode::EJECT_EXTERNAL_RESTART:
-				LOG(LogInfo) << "Ejecting external games storage and restarting EmulationStation";
-#if defined(ROCKNIX)
-				if (system("/usr/bin/automount eject-external") != 0)
-					LOG(LogError) << "Unable to eject external games storage";
-#endif
-				touch("/tmp/restart.please");
-				break;
 			case QuitMode::SWITCH_STORAGE_RESTART:
 				LOG(LogInfo) << "Switching games storage and restarting EmulationStation";
 #if defined(ROCKNIX)

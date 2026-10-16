@@ -1556,6 +1556,12 @@ msgstr "着色器"
 msgid "INTERNAL"
 msgstr "内部存储"
 
+msgid "INTERNAL STORAGE"
+msgstr "内部存储"
+
+msgid "EXTERNAL STORAGE"
+msgstr "外部存储"
+
 msgid "ANY EXTERNAL"
 msgstr "外部存储磁盘"
 

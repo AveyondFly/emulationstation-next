@@ -2517,74 +2517,46 @@ void GuiMenu::openSystemSettings()
 		});
         }
 
-	if (Utils::Platform::GetEnv("DEVICE_MMC_EJECT") != "false") {
+#if defined(ROCKNIX)
+	const bool internalGamesAvailable = Utils::Platform::GetShOutput(
+		"/usr/bin/busybox mountpoint -q /storage/games-internal && echo internal") == "internal";
+	const bool externalGamesAvailable = Utils::Platform::GetShOutput(
+		"/usr/bin/busybox mountpoint -q /storage/games-external && echo external") == "external";
+
+	// There is nothing to choose unless both game partitions are present.
+	if (internalGamesAvailable && externalGamesAvailable)
+	{
 		s->addGroup(_("STORAGE"));
-		// Provides a mechanism to disable automatic games partition mounting.
-		bool MountGamesEnabled = SystemConf::getInstance()->getBool("system.automount");
-		auto mount_games = std::make_shared<SwitchComponent>(mWindow);
-		mount_games->setState(MountGamesEnabled);
-		s->addWithLabel(_("AUTODETECT GAMES CARD"), mount_games);
-		mount_games->setOnChangedCallback([mount_games] {
-			SystemConf::getInstance()->setBool("system.automount", mount_games->getState());
-			SystemConf::getInstance()->saveSystemConf();
-			Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount", "", nullptr);
-		});
+		auto gameStorage = std::make_shared<OptionListComponent<std::string>>(mWindow, _("STORAGE DEVICE"), false);
+		std::string selectedStorage = SystemConf::getInstance()->get("system.games.storage");
+		if (selectedStorage != "auto" && selectedStorage != "internal" && selectedStorage != "external")
+			selectedStorage = "auto";
 
-		if (MountGamesEnabled)
+		gameStorage->add(_("AUTO"), "auto", selectedStorage == "auto");
+		gameStorage->add(_("INTERNAL STORAGE"), "internal", selectedStorage == "internal");
+		gameStorage->add(_("EXTERNAL STORAGE"), "external", selectedStorage == "external");
+		if (!gameStorage->hasSelection())
+			gameStorage->selectFirstItem();
+
+		s->addWithLabel(_("STORAGE DEVICE"), gameStorage);
+		s->addSaveFunc([window, gameStorage]
 		{
-			const bool internalAvailable = Utils::Platform::GetShOutput(
-				"/usr/bin/busybox mountpoint -q /storage/games-internal && echo internal") == "internal";
-			const bool externalAvailable = Utils::Platform::GetShOutput(
-				"/usr/bin/busybox mountpoint -q /storage/games-external && echo external") == "external";
+			if (!gameStorage->changed())
+				return;
 
-			// There is nothing to choose unless both game partitions are present.
-			if (internalAvailable && externalAvailable)
-			{
-				auto gameStorage = std::make_shared<OptionListComponent<std::string>>(mWindow, _("STORAGE DEVICE"), false);
-				std::string selectedStorage = SystemConf::getInstance()->get("system.games.storage");
-				if (selectedStorage != "auto" && selectedStorage != "internal" && selectedStorage != "external")
-					selectedStorage = "auto";
-
-				gameStorage->add(_("AUTO"), "auto", selectedStorage == "auto");
-				gameStorage->add(_("INTERNAL"), "internal", selectedStorage == "internal");
-				gameStorage->add(_("EXTERNAL"), "external", selectedStorage == "external");
-				if (!gameStorage->hasSelection())
-					gameStorage->selectFirstItem();
-
-				s->addWithLabel(_("STORAGE DEVICE"), gameStorage);
-				s->addSaveFunc([window, gameStorage]
-				{
-					if (!gameStorage->changed())
-						return;
-
-					SystemConf::getInstance()->set("system.games.storage", gameStorage->getSelected());
-					SystemConf::getInstance()->saveSystemConf();
-					window->pushGui(new GuiMsgBox(window,
-						_("Game storage will be switched after EmulationStation restarts"),
-						_("Restart now"), [] {
-							Utils::Platform::quitES(Utils::Platform::QuitMode::SWITCH_STORAGE_RESTART);
-						},
-						_("later"), nullptr)
-					);
-				});
-			}
-
-			if (externalAvailable)
-			{
-				s->addEntry(_("EJECT MICROSD CARD"), false, [window] {
-					const bool externalWasActive = Utils::Platform::GetShOutput(
-						"cat /run/rocknix-games-storage 2>/dev/null") == "external";
-					if (externalWasActive)
-						Utils::Platform::quitES(Utils::Platform::QuitMode::EJECT_EXTERNAL_RESTART);
-					else
-					{
-						Utils::Platform::runSystemCommand("/usr/bin/automount eject-external", "", nullptr);
-						window->pushGui(new GuiMsgBox(window, _("You may now remove the card.")));
-					}
-				});
-			}
-		}
+			SystemConf::getInstance()->set("system.games.storage", gameStorage->getSelected());
+			SystemConf::getInstance()->saveSystemConf();
+			window->pushGui(new GuiMsgBox(window,
+				_("Game storage will be switched after EmulationStation restarts"),
+				_("Restart now"), [] {
+					Utils::Platform::quitES(Utils::Platform::QuitMode::SWITCH_STORAGE_RESTART);
+				},
+				_("later"), nullptr)
+			);
+		});
 	}
+
+#endif
 
 	s->addGroup(_("PERFORMANCE"));
 	if (Utils::Platform::GetEnv("DEVICE_HAS_FAN") == "true") {
